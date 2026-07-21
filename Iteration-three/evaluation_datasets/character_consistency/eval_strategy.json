@@ -1,0 +1,30 @@
+{
+  "name": "character_consistency_eval",
+  "version": "1.0",
+  "description": "角色一致性评估策略：评估角色言行是否符合设定人设",
+  "mode": "batch_dataset",
+  "method": "explicit_with_judge",
+  "dimension": "effectiveness",
+  "weights": {
+    "character_fidelity": 0.35,
+    "world_consistency": 0.15,
+    "genre_fidelity": 0.10,
+    "faithfulness": 0.10,
+    "hallucination": 0.20,
+    "context_recall": 0.10
+  },
+  "dimension_weights": {
+    "effectiveness": 1.0
+  },
+  "metrics": [
+    "character_fidelity",
+    "world_consistency",
+    "genre_fidelity",
+    "faithfulness",
+    "hallucination",
+    "context_recall"
+  ],
+  "judge_config": {
+    "rubric_summary": "你是一位专业的角色一致性评估专家。请根据角色设定信息评估其言行是否符合人设，检查性格、说话风格、知识水平、实力等级等维度是否一致。输出JSON格式评分。"
+  }
+}

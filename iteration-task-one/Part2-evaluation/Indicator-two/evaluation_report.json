@@ -1,0 +1,286 @@
+{
+    "metrics": {
+        "goal_attainment": {
+            "description": "任务完成度（方向3）：使用LLM判断final_answer是否满足ground_truth。",
+            "average_score": 0.9259259259259259,
+            "selection_reason": "直接评估Agent整体目标达成，参考Ragas语义指标。",
+            "implementation": "LLM prompt二元判断，异常默认0。"
+        },
+        "tool_name_accuracy": {
+            "description": "工具调用准确度 - 工具名称准确率（方向1）：比较tool_call匹配比例。",
+            "average_score": 0.7932098765432097,
+            "selection_reason": "评估Action选择正确性，参考Ragas tool_call。",
+            "implementation": "规则-based精确匹配，以expected_steps为基准。"
+        },
+        "input_param_accuracy": {
+            "description": "工具调用准确度 - 输入参数准确率（方向1）：比较input JSON匹配比例。",
+            "average_score": 0.5987654320987653,
+            "selection_reason": "精细化评估参数正确性，避免仅名称匹配。",
+            "implementation": "规则-based字符串匹配。"
+        },
+        "trajectory_efficiency": {
+            "description": "规划合理性 - 轨迹效率（方向2）：steps长度比率，惩罚冗余/缺失。",
+            "average_score": 0.8722222222222222,
+            "selection_reason": "检测规划冗余，参考Ragas trajectory evaluation。",
+            "implementation": "规则-based比率计算，对称惩罚。"
+        },
+        "logic_consistency": {
+            "description": "规划合理性 - 逻辑一致性（方向2）：LLM判断thought与前observation/后tool的连贯性。",
+            "average_score": 0.9907407407407407,
+            "selection_reason": "评估推理链条断层，增强规划评估深度。",
+            "implementation": "LLM逐步判断，平均分数。"
+        },
+        "no_dead_loop": {
+            "description": "规划合理性 - 无死循环检测（方向2）：检查连续重复tool_call。",
+            "average_score": 0.8518518518518519,
+            "selection_reason": "针对Agent常见问题'死循环'，自定义规则检测。",
+            "implementation": "规则-based序列检查，有重复则0。"
+        }
+    },
+    "sample_scores": [
+        {
+            "task_id": "42966ceff3ff344b",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.75,
+            "input_param_accuracy": 0.5,
+            "trajectory_efficiency": 0.75,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "d0db4b5fdff044f9",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "9e3111b759961bbd",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 0.0
+        },
+        {
+            "task_id": "da7e075e7c66daca",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 0.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "926ad58ae915367f",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "a1a3d14a57261d1a",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.75,
+            "input_param_accuracy": 0.5,
+            "trajectory_efficiency": 0.75,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "7efa3d78cd9bb8a4",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.25,
+            "input_param_accuracy": 0.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 0.0
+        },
+        {
+            "task_id": "c17773c08b3d5d97",
+            "goal_attainment": 0.0,
+            "tool_name_accuracy": 0.75,
+            "input_param_accuracy": 0.5,
+            "trajectory_efficiency": 0.75,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "03afb270f5c56412",
+            "goal_attainment": 0.0,
+            "tool_name_accuracy": 0.75,
+            "input_param_accuracy": 0.75,
+            "trajectory_efficiency": 0.75,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "eab9973ca441fb8b",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 0.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "d6d4e1687347865b",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 0.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "f760e9b45ec310b5",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "92e78677757c0d29",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 0.6666666666666666,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "46165aad740f404e",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 0.75,
+            "no_dead_loop": 0.0
+        },
+        {
+            "task_id": "d377268ae116c741",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.3333333333333333,
+            "input_param_accuracy": 0.3333333333333333,
+            "trajectory_efficiency": 0.75,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "04000009b2b732b9",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "378e19cf48994cca",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 0.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "23caec8b0e015c8f",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "5bbd65de52152297",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 0.5,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "8d001ffac2e53e34",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 0.6666666666666666,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "a1b2c3d4e5f67890",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.75,
+            "input_param_accuracy": 0.75,
+            "trajectory_efficiency": 0.75,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "b2c3d4e5f6a78901",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "c3d4e5f6a7b89012",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.0,
+            "input_param_accuracy": 0.0,
+            "trajectory_efficiency": 0.8,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "d4e5f6a7b8c90123",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.0,
+            "input_param_accuracy": 1.0,
+            "trajectory_efficiency": 0.5,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "e5f6a7b8c9d01234",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.3333333333333333,
+            "input_param_accuracy": 0.0,
+            "trajectory_efficiency": 0.5,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 0.0
+        },
+        {
+            "task_id": "f6a7b8c9d0e12345",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 1.0,
+            "input_param_accuracy": 0.75,
+            "trajectory_efficiency": 1.0,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        },
+        {
+            "task_id": "a7b8c9d0e1f23456",
+            "goal_attainment": 1.0,
+            "tool_name_accuracy": 0.75,
+            "input_param_accuracy": 0.75,
+            "trajectory_efficiency": 0.75,
+            "logic_consistency": 1.0,
+            "no_dead_loop": 1.0
+        }
+    ],
+    "analysis": "数据集共有27个样本。整体平均分数：任务完成度0.93，工具名称准确0.79，参数准确0.60，轨迹效率0.87，逻辑一致0.99，无死循环0.85。分析：工具调用整体准确但参数易错；规划有冗余但无明显循环；完成度受支付遗漏影响。建议：强化参数验证、优化规划避免冗余、确保完整步骤。"
+}

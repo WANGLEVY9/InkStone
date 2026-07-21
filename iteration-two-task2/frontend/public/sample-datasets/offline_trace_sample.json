@@ -1,0 +1,82 @@
+{
+  "samples": [
+    {
+      "question": "解释 RAG 的工作流程",
+      "answer": "RAG 先检索相关文档，再结合检索结果生成回答。",
+      "ground_truth": "RAG = 检索 + 生成，核心是将外部知识注入生成过程。",
+      "trace": [
+        {
+          "step": 1,
+          "name": "retrieve",
+          "latency_ms": 210,
+          "success": true
+        },
+        {
+          "step": 2,
+          "name": "rerank",
+          "latency_ms": 88,
+          "success": true
+        },
+        {
+          "step": 3,
+          "name": "generate",
+          "latency_ms": 490,
+          "success": true
+        }
+      ],
+      "response_time_ms": 812,
+      "token_usage": 364,
+      "success": true
+    },
+    {
+      "question": "如何减少幻觉问题？",
+      "answer": "可以通过高质量检索、引用约束和事实校验来降低幻觉。",
+      "ground_truth": "减少幻觉常用方法包括检索增强、引用来源、拒答策略和后验校验。",
+      "trace": [
+        {
+          "step": 1,
+          "name": "retrieve",
+          "latency_ms": 260,
+          "success": true
+        },
+        {
+          "step": 2,
+          "name": "generate",
+          "latency_ms": 520,
+          "success": true
+        }
+      ],
+      "response_time_ms": 901,
+      "token_usage": 402,
+      "success": true
+    },
+    {
+      "question": "总结下面日志中的错误原因",
+      "answer": "日志显示在第三方 API 调用阶段超时。",
+      "ground_truth": "错误原因是第三方 API 超时且重试策略不足。",
+      "trace": [
+        {
+          "step": 1,
+          "name": "parse_log",
+          "latency_ms": 160,
+          "success": true
+        },
+        {
+          "step": 2,
+          "name": "reason",
+          "latency_ms": 430,
+          "success": true
+        },
+        {
+          "step": 3,
+          "name": "finalize",
+          "latency_ms": 280,
+          "success": true
+        }
+      ],
+      "response_time_ms": 902,
+      "token_usage": 298,
+      "success": true
+    }
+  ]
+}

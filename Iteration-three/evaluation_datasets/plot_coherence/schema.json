@@ -1,0 +1,39 @@
+{
+  "dataset": "plot_coherence",
+  "version": "1.0",
+  "description": "小说情节连贯性评估数据集：前文+后文对，评估逻辑连贯性",
+  "target_dimensions": ["narrative_coherence", "plot_continuity", "world_consistency", "genre_fidelity", "faithfulness", "hallucination", "context_recall"],
+  "total_samples_target": 1150,
+  "genres": ["xianxia", "urban", "western_fantasy", "xuanhuan", "historical", "sci_fi", "mystery", "light_novel"],
+  "difficulty_levels": ["easy", "medium", "hard"],
+  "error_types": ["direct_contradiction", "world_rule_violation", "temporal_inconsistency", "character_derailment", "causal_break", "genre_drift", "deus_ex_machina", "plot_hole", "emotional_inconsistency", "pacing_issue", "information_asymmetry", "dangling_thread"],
+  "sample_schema": {
+    "sample_id": "string — 全局唯一ID，格式: coherence_{genre}_{id}",
+    "genre": "string — 类型标签",
+    "difficulty": "string — 难度",
+    "input": {
+      "preceding_context": "string — 前文设定",
+      "user_request": "string — 用户指令"
+    },
+    "output": {
+      "text": "string — Agent 续写内容"
+    },
+    "reference": {
+      "coherence_score": "int 1-5 — 连贯性评分",
+      "rationale": "string — 评分理由",
+      "contradiction_types": "string[] — 矛盾类型列表",
+      "expected_behavior": "string — 预期正确行为"
+    },
+    "evaluation": {
+      "narrative_coherence": "int 1-5",
+      "plot_continuity": "int 1-5",
+      "world_consistency": "int 1-5",
+      "genre_fidelity": "int 1-5",
+      "faithfulness": "float 0-1",
+      "hallucination": "float 0-1",
+      "context_recall": "float 0-1"
+    },
+    "negative_sample": "bool",
+    "error_type": "string — 负面样例专用"
+  }
+}

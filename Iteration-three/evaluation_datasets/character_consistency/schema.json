@@ -1,0 +1,40 @@
+{
+  "dataset": "character_consistency",
+  "version": "1.0",
+  "description": "角色一致性检测数据集：角色设定+多条台词/行为，标注是否符合人设",
+  "target_dimensions": ["character_fidelity", "world_consistency", "genre_fidelity", "faithfulness", "hallucination", "context_recall"],
+  "total_profiles_target": 50,
+  "total_utterances_target": 500,
+  "genres": ["xianxia", "urban", "western_fantasy", "xuanhuan", "historical", "sci_fi", "mystery", "light_novel"],
+  "error_types": ["character_derailment", "personality_flip", "knowledge_mismatch", "speech_style_break", "power_level_inconsistency", "motivation_gap", "relationship_inconsistency", "emotional_flattening", "character_obsolescence", "backstory_contradiction"],
+  "sample_schema": {
+    "sample_id": "string — char_{genre}_{id}",
+    "genre": "string",
+    "character_profile": {
+      "name": "string",
+      "age": "int",
+      "identity": "string",
+      "personality": "string",
+      "background": "string",
+      "speaking_style": "string",
+      "core_traits": "string[]",
+      "relationships": "object"
+    },
+    "utterances": [
+      {
+        "utterance_id": "string",
+        "context": "string",
+        "text": "string",
+        "is_consistent": "bool",
+        "rationale": "string",
+        "error_type": "string"
+      }
+    ],
+    "evaluation_summary": {
+      "character_fidelity": "float",
+      "world_consistency": "float",
+      "hallucination": "float",
+      "consistency_rate": "float"
+    }
+  }
+}

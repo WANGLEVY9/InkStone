@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 05</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .comparison-row > div { padding: 1rem; border-radius: var(--radius-sm); }
+  .col-before { background: #fff1f0; border: 1px solid #ffccc7; }
+  .col-after { background: #f6ffed; border: 1px solid #b7eb8f; }
+  .col-before h5, .col-after h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.4rem; }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  li { margin-bottom: 0.25rem; }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+  .highlight-up { color: var(--accent-green); font-weight: 600; }
+  .highlight-down { color: var(--accent-red); font-weight: 600; }
+  pre { background: #f1f5f9; padding: 0.8rem 1rem; border-radius: var(--radius-sm); font-family: var(--mono); font-size: 0.78rem; overflow-x: auto; margin: 0.5rem 0; border: 1px solid var(--border); white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="badge">迭代二 · 优化评估</div>
+  <h1>评估报告 ROUND 05</h1>
+  <p class="sub">Few-shot 示例增强 v0.5 — 通过类型专属示例提升生成质量</p>
+  <dl class="meta">
+    <div><dt>日期</dt><dd>2026-05-22</dd></div>
+    <div><dt>版本</dt><dd>v0.5</dd></div>
+    <div><dt>优化策略</dt><dd>Few-shot 示例注入</dd></div>
+    <div><dt>数据集</dt><dd>5x 扩展集 (8,000 条)</dd></div>
+  </dl>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">1</div>
+    <h2>优化概述</h2>
+  </div>
+  <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:1rem;">
+    R05 在系统提示中为每个类型注入 2 条人工标注的高质量 few-shot 示例，共计 16 条精选示例。
+    示例覆盖了每种类型的典型情节转折、人物对话风格和场景描写范式，旨在减小模型对输出格式和风格的探索空间，
+    引导生成更贴近目标类型语料库的续写内容。
+  </p>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">Answer Relevancy</div>
+      <div class="value">0.76</div>
+      <div class="sub"><span class="highlight-up">&#9650; +0.06</span> 对比 R04 (0.70)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Faithfulness</div>
+      <div class="value">0.74</div>
+      <div class="sub"><span class="highlight-up">&#9650; +0.03</span> 对比 R04 (0.71)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Task Success</div>
+      <div class="value">84.2%</div>
+      <div class="sub"><span class="highlight-up">&#9650; +3.8pp</span> 对比 R04 (80.4%)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">示例总数</div>
+      <div class="value">16</div>
+      <div class="sub">每类型 2 条 &#8226; 8 类型</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">2</div>
+    <h2>Few-shot 示例库</h2>
+  </div>
+  <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">
+    以下为注入提示词的示例节选，涵盖风格差异较大的两个类型。
+  </p>
+
+  <div class="opt-box">
+    <h4>&#9733; 仙侠 (Xianxia) — 示例 #1</h4>
+    <pre><strong>用户输入:</strong>
+"青云宗外，雷云压顶。林尘单膝跪地，嘴角溢血。"
+<strong>期望续写:</strong>
+林尘缓缓起身，掌心翻涌间一道青光破空而出。他抬眼望向云端那三道身影，嘴角扬起一抹冷笑："区区三长老的分身，也配拦我？"
+刹那间，天地灵气疯狂汇聚，方圆百里的飞剑铮鸣不止。观战的低阶弟子只觉得胸口一闷，竟被这股气势逼得连退数步。</pre>
+  </div>
+
+  <div class="opt-box">
+    <h4>&#9733; 悬疑 (Mystery) — 示例 #1</h4>
+    <pre><strong>用户输入:</strong>
+"雨夜，城南老宅传来第三声钟响。侦探陆沉推开铁门，手电筒扫过积灰的大厅。"
+<strong>期望续写:</strong>
+地面上有一串脚印，从门口延伸到楼梯口，然后又折返回来——但折返的脚印明显比去时要浅三分。陆沉蹲下身，用指尖捻起一点泥土，放在鼻尖嗅了嗅。
+"海边的红土……"他喃喃道，抬眼看向楼梯上漆黑的走廊，"凶手想告诉我们什么？"
+墙角的留声机突然自己转动起来，吱呀作响地播放起一首二十年前的老歌。</pre>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">3</div>
+    <h2>各类型效果对比</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>类型</th>
+          <th>R04 Faith.</th>
+          <th>R05 Faith.</th>
+          <th>变化</th>
+          <th>R04 Relev.</th>
+          <th>R05 Relev.</th>
+          <th>变化</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>仙侠 Xianxia</td>
+          <td>0.73</td>
+          <td>0.78</td>
+          <td class="highlight-up">+0.05</td>
+          <td>0.68</td>
+          <td>0.75</td>
+          <td class="highlight-up">+0.07</td>
+        </tr>
+        <tr>
+          <td>都市 Urban</td>
+          <td>0.70</td>
+          <td>0.74</td>
+          <td class="highlight-up">+0.04</td>
+          <td>0.72</td>
+          <td>0.77</td>
+          <td class="highlight-up">+0.05</td>
+        </tr>
+        <tr>
+          <td>奇幻 Fantasy</td>
+          <td>0.74</td>
+          <td>0.76</td>
+          <td class="highlight-up">+0.02</td>
+          <td>0.69</td>
+          <td>0.74</td>
+          <td class="highlight-up">+0.05</td>
+        </tr>
+        <tr>
+          <td>玄幻 Xuanhuan</td>
+          <td>0.72</td>
+          <td>0.77</td>
+          <td class="highlight-up">+0.05</td>
+          <td>0.71</td>
+          <td>0.76</td>
+          <td class="highlight-up">+0.05</td>
+        </tr>
+        <tr>
+          <td>历史 Historical</td>
+          <td>0.52</td>
+          <td>0.60</td>
+          <td class="highlight-up">+0.08</td>
+          <td>0.65</td>
+          <td>0.70</td>
+          <td class="highlight-up">+0.05</td>
+        </tr>
+        <tr>
+          <td>科幻 Sci-fi</td>
+          <td>0.66</td>
+          <td>0.71</td>
+          <td class="highlight-up">+0.05</td>
+          <td>0.70</td>
+          <td>0.74</td>
+          <td class="highlight-up">+0.04</td>
+        </tr>
+        <tr>
+          <td>悬疑 Mystery</td>
+          <td>0.69</td>
+          <td>0.72</td>
+          <td class="highlight-up">+0.03</td>
+          <td>0.73</td>
+          <td>0.78</td>
+          <td class="highlight-up">+0.05</td>
+        </tr>
+        <tr>
+          <td>轻小说 Light Novel</td>
+          <td>0.71</td>
+          <td>0.74</td>
+          <td class="highlight-up">+0.03</td>
+          <td>0.74</td>
+          <td>0.78</td>
+          <td class="highlight-up">+0.04</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem;">
+    Faith. = Faithfulness (忠实度) &nbsp;|&nbsp; Relev. = Answer Relevancy (回答相关性)
+  </p>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">4</div>
+    <h2>遗留问题与风险</h2>
+  </div>
+  <ul>
+    <li><strong>Hard negative 样本处理不佳：</strong>当输入包含对抗性前缀或隐含的敏感话题时，few-shot 示例未能有效引导模型拒绝回答，安全边界仍需加固。</li>
+    <li><strong>历史类型仍然薄弱：</strong>尽管 faithfulness 从 0.52 提升至 0.60，仍显著低于平均水平（0.74），历史细节一致性问题未根本解决。</li>
+    <li><strong>示例长度膨胀：</strong>每类型 2 条示例使提示词 token 消耗增加约 1,200 tokens（+18%），对长上下文场景的推理延迟产生边际影响。</li>
+    <li><strong>跨类型泛化：</strong>示例均为人工撰写，对数据集中边缘子类型的覆盖不足（如"科幻+悬疑"混合类场景）。</li>
+  </ul>
+</div>
+
+<div class="footer">
+  <p>Agent 网文续写评估平台 &middot; 迭代二 &middot; ROUND 05 &middot; 生成时间 2026-05-22</p>
+</div>
+
+</body>
+</html>

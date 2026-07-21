@@ -1,0 +1,8 @@
+# Optional advanced evaluation dependencies (Ragas)
+# Install when you need production-grade result evaluation.
+# Usage:
+#   pip install -r requirements.txt -r requirements-advanced.txt
+
+datasets==2.21.0
+ragas==0.2.5
+langchain==0.3.7

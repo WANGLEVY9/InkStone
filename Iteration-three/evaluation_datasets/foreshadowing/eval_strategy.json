@@ -1,0 +1,26 @@
+{
+  "name": "foreshadowing_eval",
+  "version": "1.0",
+  "description": "伏笔回收评估策略：评估伏笔是否得到有效回收",
+  "mode": "batch_dataset",
+  "method": "explicit_with_judge",
+  "dimension": "effectiveness",
+  "weights": {
+    "foreshadowing_resolution": 0.35,
+    "plot_continuity": 0.20,
+    "context_recall": 0.20,
+    "hallucination": 0.25
+  },
+  "dimension_weights": {
+    "effectiveness": 1.0
+  },
+  "metrics": [
+    "foreshadowing_resolution",
+    "plot_continuity",
+    "context_recall",
+    "hallucination"
+  ],
+  "judge_config": {
+    "rubric_summary": "你是一位专业的伏笔回收评估专家。请评估伏笔句与回收句是否形成有效前后呼应，检查回收是否自然、是否与原伏笔意图一致。输出JSON格式评分。"
+  }
+}

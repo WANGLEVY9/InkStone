@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 06</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .opt-box h5 { font-size: 0.82rem; margin-bottom: 0.4rem; color: var(--text); }
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .comparison-row > div { padding: 1rem; border-radius: var(--radius-sm); }
+  .col-before { background: #fff1f0; border: 1px solid #ffccc7; }
+  .col-after { background: #f6ffed; border: 1px solid #b7eb8f; }
+  .col-before h5, .col-after h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.4rem; }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  li { margin-bottom: 0.25rem; }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+  .highlight-up { color: var(--accent-green); font-weight: 600; }
+  .highlight-down { color: var(--accent-red); font-weight: 600; }
+  .highlight-neutral { color: var(--accent-yellow); font-weight: 600; }
+  pre { background: #f1f5f9; padding: 0.8rem 1rem; border-radius: var(--radius-sm); font-family: var(--mono); font-size: 0.78rem; overflow-x: auto; margin: 0.5rem 0; border: 1px solid var(--border); white-space: pre-wrap; }
+  .flow-box { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin: 1rem 0; flex-wrap: wrap; }
+  .flow-step { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.6rem 1rem; text-align: center; flex: 1; min-width: 120px; font-size: 0.78rem; font-weight: 600; box-shadow: var(--shadow); }
+  .flow-arrow { color: var(--text-muted); font-size: 1.2rem; font-weight: 300; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="badge">迭代二 · 优化评估</div>
+  <h1>评估报告 ROUND 06</h1>
+  <p class="sub">安全护栏与内容过滤 v0.6 — 多层安全机制降低有害输出</p>
+  <dl class="meta">
+    <div><dt>日期</dt><dd>2026-05-25</dd></div>
+    <div><dt>版本</dt><dd>v0.6</dd></div>
+    <div><dt>优化策略</dt><dd>安全过滤 + 模式拦截</dd></div>
+    <div><dt>数据集</dt><dd>5x 扩展集 (8,000 条)</dd></div>
+  </dl>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">1</div>
+    <h2>优化概述</h2>
+  </div>
+  <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:1rem;">
+    R06 针对网文生成中可能出现的不安全内容，引入三层安全过滤架构。新增 45 条禁止模式（banned patterns）、
+    一个三分类安全分类器（暴力 / 成人 / 政治）以及生成后过滤机制。所有输出在返回前经过安全评分，
+    低于安全阈值的输出将被拦截并替换为安全 fallback 文本。
+  </p>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">Safety Score</div>
+      <div class="value">4.3</div>
+      <div class="sub"><span class="highlight-up">&#9650; +0.5</span> 对比 R05 (3.8)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Toxic Output Rate</div>
+      <div class="value">0.3%</div>
+      <div class="sub"><span class="highlight-up">&#9660; -1.8pp</span> 对比 R05 (2.1%)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Task Success</div>
+      <div class="value">85.1%</div>
+      <div class="sub"><span class="highlight-up">&#9650; +0.9pp</span> 对比 R05 (84.2%)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Banned Patterns</div>
+      <div class="value">45</div>
+      <div class="sub">暴力 18 / 成人 16 / 政治 11</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">2</div>
+    <h2>安全过滤器架构</h2>
+  </div>
+  <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.8rem;">
+    过滤流水线按照以下三个阶段依次处理模型输出：
+  </p>
+  <div class="flow-box">
+    <div class="flow-step">&#9312; 模式匹配<br><span style="font-weight:400;font-size:0.7rem;">45 条正则 banned patterns</span></div>
+    <span class="flow-arrow">&#8594;</span>
+    <div class="flow-step">&#9313; 三分类分类器<br><span style="font-weight:400;font-size:0.7rem;">暴力 / 成人 / 政治 评分</span></div>
+    <span class="flow-arrow">&#8594;</span>
+    <div class="flow-step">&#9314; 后处理拦截<br><span style="font-weight:400;font-size:0.7rem;">阈值判定 &amp; fallback</span></div>
+  </div>
+
+  <div class="opt-box" style="margin-top:1rem;">
+    <h4>三分类安全分类器详情</h4>
+    <div class="table-wrap" style="margin-top:0.5rem;">
+      <table>
+        <thead>
+          <tr><th>类别</th><th>Banned 模式数</th><th>判定阈值</th><th>典型拦截示例</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>暴力 / 血腥</td><td>18</td><td>score &gt; 0.7</td><td>肢解、酷刑描写、过度血腥</td></tr>
+          <tr><td>成人 / 色情</td><td>16</td><td>score &gt; 0.6</td><td>露骨性描写、色情暗示</td></tr>
+          <tr><td>政治敏感</td><td>11</td><td>score &gt; 0.5</td><td>影射现实事件、敏感人物</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem;">
+      分类器基于轻量级 BERT 微调模型，推理耗时约 25ms/次。
+    </p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">3</div>
+    <h2>安全类别细项改善</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>安全维度</th>
+          <th>R05 评分</th>
+          <th>R06 评分</th>
+          <th>变化</th>
+          <th>R05 触发率</th>
+          <th>R06 触发率</th>
+          <th>变化</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>暴力 / 血腥</td>
+          <td>3.6</td>
+          <td>4.5</td>
+          <td class="highlight-up">+0.9</td>
+          <td>2.8%</td>
+          <td>0.4%</td>
+          <td class="highlight-up">-2.4pp</td>
+        </tr>
+        <tr>
+          <td>成人 / 色情</td>
+          <td>4.0</td>
+          <td>4.4</td>
+          <td class="highlight-up">+0.4</td>
+          <td>1.5%</td>
+          <td>0.2%</td>
+          <td class="highlight-up">-1.3pp</td>
+        </tr>
+        <tr>
+          <td>政治敏感</td>
+          <td>3.7</td>
+          <td>4.1</td>
+          <td class="highlight-up">+0.4</td>
+          <td>1.9%</td>
+          <td>0.3%</td>
+          <td class="highlight-up">-1.6pp</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">4</div>
+    <h2>性能权衡分析</h2>
+  </div>
+  <div class="comparison-row">
+    <div class="col-before">
+      <h5>R05 (无过滤)</h5>
+      <ul>
+        <li>平均响应时间: <strong>1,780 ms</strong></li>
+        <li>P95 响应时间: <strong>3,120 ms</strong></li>
+        <li>安全相关误拦截: <strong>0 次</strong></li>
+        <li>有害输出泄露: <strong>2.1%</strong></li>
+      </ul>
+    </div>
+    <div class="col-after">
+      <h5>R06 (有过滤)</h5>
+      <ul>
+        <li>平均响应时间: <strong>1,990 ms</strong></li>
+        <li>P95 响应时间: <strong>3,580 ms</strong></li>
+        <li>安全相关误拦截: <strong>4 次 / 1,000 条</strong></li>
+        <li>有害输出泄露: <strong>0.3%</strong></li>
+      </ul>
+    </div>
+  </div>
+  <p style="font-size:0.85rem;color:var(--text-secondary);">
+    <strong>权衡总结：</strong>响应时间增加约 12%（210 ms），P95 延迟增加 460 ms。
+    代价主要来自三分类分类器的推理开销和正则匹配流水线。误拦截率约 0.4%，属可接受范围，但仍有改进空间。
+    在安全性优先的场景下，此权衡可视为合理让步。
+  </p>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">5</div>
+    <h2>遗留问题</h2>
+  </div>
+  <ul>
+    <li><strong>误拦截（False Positive）：</strong>部分正常武侠打斗描写被暴力分类器误判，需细化模式匹配的白名单。</li>
+    <li><strong>延迟敏感场景：</strong>对实时性要求高的 demo 场景，210ms 额外延迟可能影响用户体验。</li>
+    <li><strong>对抗性绕过：</strong>少部分测试样本通过同音字替换或拼音编码绕过了正则匹配层，需引入语义级检测。</li>
+  </ul>
+</div>
+
+<div class="footer">
+  <p>Agent 网文续写评估平台 &middot; 迭代二 &middot; ROUND 06 &middot; 生成时间 2026-05-25</p>
+</div>
+
+</body>
+</html>

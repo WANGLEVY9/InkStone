@@ -1,0 +1,326 @@
+/* ============================================================
+   砚台丹青 · Inkstone & Vermillion Design Tokens
+   ----------------------------------------------------------------
+   A scholar's study aesthetic for an AI novel-writing platform.
+   Aged-paper backgrounds, ink blacks, vermillion accents,
+   serif typography. All visual values resolve here.
+   ============================================================ */
+
+:root {
+  /* ----- Paper surface ----- */
+  --paper-base:        #F5EFE3;  /* aged xuan paper */
+  --paper-elevated:    #FBF6EA;  /* card / raised surface */
+  --paper-sunken:      #EDE5D2;  /* input / code surface */
+
+  /* ----- Ink (text) ----- */
+  --ink-heavy:         #1F1A17;
+  --ink-medium:        #4A3F33;
+  --ink-light:         #6E5F4F;
+  --ink-faint:         #A89B85;
+
+  /* ----- Vermillion (accent) ----- */
+  --vermilion:         #C8323D;
+  --vermilion-deep:    #9F2530;
+  --vermilion-bg:      #F8E8E5;
+
+  /* ----- Auxiliary ----- */
+  --bamboo:            #2E5A4D;  /* success / active */
+  --bamboo-bg:         #E0EBE6;
+  --gold-leaf:         #B8924A;  /* rare emphasis */
+  --gold-leaf-bg:      #F5ECD7;
+
+  /* ----- Lines ----- */
+  --silk-line:         #E0D5C2;
+  --silk-line-strong:  #C9B999;
+
+  /* ----- Wood (sidebar) ----- */
+  --wood-deep:         #3A2A1F;
+  --wood-mid:          #5A4231;
+  --wood-light:        #8B6E55;
+
+  /* ----- Shadow (paper-on-paper) ----- */
+  --shadow-sm:  0 1px 2px rgba(31, 26, 23, 0.06);
+  --shadow-md:  0 2px 8px rgba(31, 26, 23, 0.10), 0 1px 2px rgba(31, 26, 23, 0.06);
+  --shadow-lg:  0 8px 24px rgba(31, 26, 23, 0.14), 0 2px 6px rgba(31, 26, 23, 0.08);
+  --shadow-book: 4px 4px 14px rgba(0, 0, 0, 0.4), 1px 1px 4px rgba(0, 0, 0, 0.3);
+
+  /* ----- Typography ----- */
+  --font-display:  'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  --font-body:     'LXGW WenKai', '霞鹜文楷', 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+  --font-brush:    'Ma Shan Zheng', 'LXGW WenKai', '霞鹜文楷', 'Songti SC', serif;
+  --font-mono:     'JetBrains Mono', 'Sarasa Mono SC', 'Menlo', 'Consolas', monospace;
+  --font-latin:    'Cormorant Garamond', 'EB Garamond', 'Georgia', serif;
+
+  /* ----- Radius (more squared, classical) ----- */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+}
+
+/* ----- Paper texture noise -----
+   Subtle grain so the cream ground does not look flat. */
+body {
+  font-family: var(--font-body);
+  color: var(--ink-heavy);
+  background-color: var(--paper-base);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.12 0 0 0 0 0.08 0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ----- Selection: vermillion ink wash ----- */
+::selection {
+  background: var(--vermilion-bg);
+  color: var(--vermilion-deep);
+}
+
+/* ----- Headings default to display serif ----- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--ink-heavy);
+  font-weight: 700;
+}
+
+/* ----- Scrollbar (subtle, paper-tone) ----- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--silk-line-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+/* ----- Heatmap: hide scrollbars ----- */
+.heatmap-no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.heatmap-no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ----- Vermillion-stamp utility class (square seal style) ----- */
+.seal-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--vermilion);
+  color: var(--paper-base);
+  font-family: var(--font-display);
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 2px rgba(159, 37, 48, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* ----- Seal-style tag (replaces antd colored Tag throughout) -----
+   Use the built-in Ant Design <Tag> with one of: seal-tag (default vermilion),
+   seal-tag-bamboo, seal-tag-gold.  The base CSS sits underneath antd's Tag. */
+.ant-tag.seal-tag,
+.ant-tag.seal-tag-bamboo,
+.ant-tag.seal-tag-gold {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-sm);
+  padding: 0 6px;
+  line-height: 18px;
+  margin: 0;
+  border: 1px solid transparent;
+}
+.ant-tag.seal-tag {
+  background: var(--vermilion-bg);
+  color: var(--vermilion);
+  border-color: rgba(200, 50, 61, 0.20);
+}
+.ant-tag.seal-tag-bamboo {
+  background: var(--bamboo-bg);
+  color: var(--bamboo);
+  border-color: rgba(46, 90, 77, 0.20);
+}
+.ant-tag.seal-tag-gold {
+  background: var(--gold-leaf-bg);
+  color: var(--gold-leaf);
+  border-color: rgba(184, 146, 74, 0.22);
+}
+
+/* ----- Page heading (used by PageHeader) -----
+   Section-flyleaf style: oversized serif + vermillion accent rule. */
+.literati-heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink-heavy);
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+.literati-heading-rule {
+  margin-top: 8px;
+  height: 1px;
+  width: 32px;
+  background: var(--vermilion);
+}
+
+/* ----- Editor-page title input (borderless serif on paper) ----- */
+.literati-title-input {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink-heavy);
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  border: none;
+  padding: 0;
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+}
+.literati-title-input::placeholder { color: var(--ink-faint); }
+.literati-title-input:focus { box-shadow: none; }
+
+.literati-summary-input {
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: var(--ink-medium);
+  font-family: var(--font-body);
+  font-size: 13px;
+  box-shadow: none;
+}
+.literati-summary-input::placeholder { color: var(--ink-faint); }
+.literati-summary-input:focus { box-shadow: none; }
+
+/* ----- Onboarding target lift -----
+   Keeps the active form control clickable above the guide mask. */
+.onboarding-active-target,
+.onboarding-active-target:hover,
+.onboarding-active-target:focus {
+  position: relative;
+  z-index: 2800;
+  pointer-events: auto;
+}
+
+.onboarding-active-modal .ant-modal-content {
+  position: relative;
+  z-index: 2800;
+  pointer-events: auto;
+}
+
+.onboarding-active-modal-wrap,
+.onboarding-active-modal-wrap .ant-modal,
+.onboarding-active-modal-wrap .ant-modal-content,
+.onboarding-active-modal-wrap .ant-modal-body,
+.onboarding-active-modal-wrap .ant-modal-footer {
+  pointer-events: auto;
+}
+
+.onboarding-secondary-nav-active {
+  z-index: 2800 !important;
+  pointer-events: auto !important;
+}
+
+.onboarding-secondary-nav-active .ant-menu {
+  pointer-events: auto !important;
+}
+
+.onboarding-secondary-nav-active .ant-menu-item,
+.onboarding-secondary-nav-active .ant-menu-item * {
+  pointer-events: none !important;
+}
+
+.onboarding-secondary-nav-active .ant-menu-item.onboarding-clickable-target,
+.onboarding-secondary-nav-active .ant-menu-item.onboarding-clickable-target *,
+.onboarding-clickable-target,
+.onboarding-clickable-target * {
+  position: relative !important;
+  z-index: 2800 !important;
+  pointer-events: auto !important;
+}
+
+/* ----- Onboarding overlay (view-only tour; page clicks blocked) ----- */
+.onboarding-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 2590;
+  pointer-events: auto;
+  background: transparent;
+}
+
+.onboarding-mask-full {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  pointer-events: none;
+  background: rgba(58, 42, 31, 0.48);
+}
+
+.onboarding-mask-panel {
+  background: rgba(58, 42, 31, 0.48);
+  transition:
+    top var(--motion-normal) var(--ease-out),
+    left var(--motion-normal) var(--ease-out),
+    width var(--motion-normal) var(--ease-out),
+    height var(--motion-normal) var(--ease-out);
+}
+
+.onboarding-highlight {
+  position: fixed;
+  z-index: 2600;
+  pointer-events: none;
+  border: 2px solid var(--vermilion);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 2px rgba(248, 232, 229, 0.8), 0 0 18px rgba(200, 50, 61, 0.35);
+  transition:
+    top var(--motion-normal) var(--ease-out),
+    left var(--motion-normal) var(--ease-out),
+    width var(--motion-normal) var(--ease-out),
+    height var(--motion-normal) var(--ease-out);
+}
+
+.onboarding-guide {
+  position: fixed;
+  z-index: 3000;
+  padding: 16px;
+  border: 1px solid var(--silk-line-strong);
+  border-left: 4px solid var(--vermilion);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  color: var(--ink-heavy);
+  background-color: var(--paper-elevated);
+  background-image: var(--texture-paper-fine, none);
+  background-blend-mode: multiply;
+  opacity: 0.72;
+  transition:
+    top var(--motion-normal) var(--ease-out),
+    left var(--motion-normal) var(--ease-out),
+    opacity var(--motion-fast) var(--ease-out);
+}
+
+.onboarding-guide--ready {
+  opacity: 1;
+}
+
+.onboarding-guide__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.onboarding-guide__content {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ink-medium);
+  margin-bottom: 14px;
+}
+
+.onboarding-guide__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.onboarding-guide__actions {
+  display: flex;
+  gap: 8px;
+}

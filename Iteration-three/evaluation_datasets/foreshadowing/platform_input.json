@@ -1,0 +1,14 @@
+{
+  "samples": [
+    {
+      "sample_id": "foreshadow_xianxia_001",
+      "question": "评估以下伏笔与回收是否匹配：\n伏笔（第5章）：李逍遥在古洞中捡到一块黑色石头，触手冰凉，有灵气波动。\n回收（第23章）：生死关头，李逍遥将灵力灌入黑色石头，石头碎裂露出上古剑仙元神。",
+      "answer": "有效回收——石头封印了剑仙元神，在关键时刻助主角突破。前后呼应合理，伏笔到回收的间隔合理。",
+      "contexts": ["伏笔：普通物品隐藏秘密", "回收：危机关头揭示秘密"],
+      "ground_truth": "有效回收，foreshadowing_resolution=1",
+      "foreshadowing_resolution": 1,
+      "plot_continuity": 5,
+      "gap_chapters": 18
+    }
+  ]
+}

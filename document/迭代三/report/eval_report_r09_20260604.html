@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 09</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .comparison-row > div { padding: 1rem; border-radius: var(--radius-sm); background: #fff1f0; border: 1px solid #ffccc7; }
+  .comparison-row .col-after { background: #f6ffed; border: 1px solid #b7eb8f; }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="badge">迭代二 · 对抗训练</div>
+  <h1>Agent 网文续写评估报告</h1>
+  <p class="sub">ROUND 09 — 负面样本对抗训练 v0.9 | 2026-06-04</p>
+  <dl class="meta">
+    <div><dt>数据集</dt><dd>plot_coherence (520 样本)</dd></div>
+    <div><dt>模型</dt><dd>Claude 4.5 Sonnet (基线) + Prompt v0.9</dd></div>
+    <div><dt>优化焦点</dt><dd>错误模式识别 · 自一致性检查</dd></div>
+    <div><dt>评估日期</dt><dd>2026-06-04</dd></div>
+  </dl>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">1</div>
+    <h2>本轮优化概要</h2>
+  </div>
+  <p>ROUND 09 聚焦于负面样本对抗训练。通过分析前八轮评估中积累的 200+ 失败案例，我们归纳出 12 类典型错误模式，并将"错误类型检测清单"直接嵌入系统提示词中。同时引入<strong>自一致性检查机制</strong>：Agent 在生成续写内容后，自动对自身输出进行一轮错误模式扫描，若命中已知错误类型则触发修正流程。</p>
+  <ul>
+    <li><strong>错误类型检测清单</strong> — 12 种错误模式，每种附带检测规则和修正建议</li>
+    <li><strong>自一致性检查</strong> — 输出后处理环节，Agent 自我审查并修正潜在错误</li>
+    <li><strong>动态权重调整</strong> — 根据错误类型的严重程度动态调整惩罚权重</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">2</div>
+    <h2>核心指标对比</h2>
+  </div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">忠实度 (Faithfulness)</div>
+      <div class="value" style="color:var(--accent-green);">0.80</div>
+      <div class="sub">前轮: 0.78 <span style="color:var(--accent-green);">&#9650; +0.02</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">负面样本检测率</div>
+      <div class="value" style="color:var(--accent-green);">68%</div>
+      <div class="sub">前轮: 45% <span style="color:var(--accent-green);">&#9650; +23pp</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">错误恢复率</div>
+      <div class="value" style="color:var(--accent-yellow);">62%</div>
+      <div class="sub">检测到的错误中成功修正的比例</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Token 消耗增量</div>
+      <div class="value" style="color:var(--accent-orange);">+8%</div>
+      <div class="sub">自一致性检查带来的额外开销</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">3</div>
+    <h2>错误类型检测清单 &amp; 检测率</h2>
+  </div>
+  <p>以下为嵌入系统提示词中的 12 类错误模式及其检测率变化：</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>错误类型</th>
+          <th>描述</th>
+          <th>检测率 (前)</th>
+          <th>检测率 (后)</th>
+          <th>变化</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>E01</td>
+          <td>角色名混淆</td>
+          <td>将角色 A 的行为错误地归因于角色 B</td>
+          <td>52%</td>
+          <td>79%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +27pp</span></td>
+        </tr>
+        <tr>
+          <td>E02</td>
+          <td>时间线错乱</td>
+          <td>事件顺序与原文设定不符</td>
+          <td>48%</td>
+          <td>74%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +26pp</span></td>
+        </tr>
+        <tr>
+          <td>E03</td>
+          <td>设定违背</td>
+          <td>修仙等级/世界观规则被破坏</td>
+          <td>55%</td>
+          <td>81%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +26pp</span></td>
+        </tr>
+        <tr>
+          <td>E04</td>
+          <td>逻辑矛盾</td>
+          <td>因果链条断裂或自相矛盾</td>
+          <td>40%</td>
+          <td>65%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +25pp</span></td>
+        </tr>
+        <tr>
+          <td>E05</td>
+          <td>人称/性别不一致</td>
+          <td>代词使用错误或性别混淆</td>
+          <td>60%</td>
+          <td>85%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +25pp</span></td>
+        </tr>
+        <tr>
+          <td>E06</td>
+          <td>技能/法宝属性错误</td>
+          <td>技能效果或法宝属性与设定不符</td>
+          <td>42%</td>
+          <td>66%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +24pp</span></td>
+        </tr>
+        <tr>
+          <td>E07</td>
+          <td>情感反应失当</td>
+          <td>角色情感反应与情境/人设不符</td>
+          <td>38%</td>
+          <td>61%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +23pp</span></td>
+        </tr>
+        <tr>
+          <td>E08</td>
+          <td>重复内容生成</td>
+          <td>同一情节/描述在短期内重复出现</td>
+          <td>58%</td>
+          <td>80%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +22pp</span></td>
+        </tr>
+        <tr>
+          <td>E09</td>
+          <td>对话风格偏离</td>
+          <td>角色说话方式与人设档案不一致</td>
+          <td>35%</td>
+          <td>56%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +21pp</span></td>
+        </tr>
+        <tr>
+          <td>E10</td>
+          <td>场景切换突兀</td>
+          <td>缺乏过渡的场景/视角跳跃</td>
+          <td>44%</td>
+          <td>64%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +20pp</span></td>
+        </tr>
+        <tr>
+          <td>E11</td>
+          <td>数值/时间计算错误</td>
+          <td>修炼年限、距离、数量等数值错误</td>
+          <td>46%</td>
+          <td>65%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +19pp</span></td>
+        </tr>
+        <tr>
+          <td>E12</td>
+          <td>文化常识错误</td>
+          <td>历史/文化细节与背景设定冲突</td>
+          <td>30%</td>
+          <td>48%</td>
+          <td><span style="color:var(--accent-green);">&#9650; +18pp</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">4</div>
+    <h2>自一致性检查机制</h2>
+  </div>
+  <div class="opt-box">
+    <h4>自一致性检查 Prompt 示例</h4>
+    <p style="font-family:var(--mono);font-size:0.8rem;background:#f1f5f9;padding:1rem;border-radius:var(--radius-sm);white-space:pre-wrap;color:var(--text);">
+[自一致性检查]
+
+请对你刚刚生成的续写内容进行以下检查：
+
+1. [E01] 检查所有角色名称：是否有将角色A的行为归因于角色B？
+2. [E02] 检查时间线：事件顺序是否与原文一致？
+3. [E03] 检查世界观设定：是否有违背核心规则之处？
+4. [E04] 检查逻辑因果：是否有自相矛盾或因果断裂？
+5. [E05] 检查人称代词：是否有不一致之处？
+6. [E08] 检查重复性：是否有与前文重复的内容？
+
+如果发现上述任何问题，请定位具体位置并给出修正版本。
+若全部通过，回复 "[一致性检查通过]"
+    </p>
+  </div>
+  <p>自一致性检查在 Agent 生成续写后立即执行，定位到错误后触发修正流程。修正后的内容会再次通过检查直至通过或达到最大重试次数（当前设置为 3 次）。</p>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">5</div>
+    <h2>Genre 分项评分</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Genre</th>
+          <th>Faithfulness</th>
+          <th>负样本检测率</th>
+          <th>错误恢复率</th>
+          <th>Token 增量</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>仙侠 (Xianxia)</td><td>0.82</td><td>71%</td><td>65%</td><td>+9%</td></tr>
+        <tr><td>都市 (Urban)</td><td>0.79</td><td>65%</td><td>60%</td><td>+7%</td></tr>
+        <tr><td>玄幻 (Fantasy)</td><td>0.81</td><td>70%</td><td>63%</td><td>+8%</td></tr>
+        <tr><td>奇幻 (Xuanhuan)</td><td>0.80</td><td>68%</td><td>62%</td><td>+8%</td></tr>
+        <tr><td>历史 (Historical)</td><td>0.78</td><td>66%</td><td>61%</td><td>+8%</td></tr>
+        <tr><td>科幻 (Sci-Fi)</td><td>0.79</td><td>67%</td><td>60%</td><td>+7%</td></tr>
+        <tr><td>悬疑 (Mystery)</td><td>0.77</td><td>64%</td><td>58%</td><td>+9%</td></tr>
+        <tr><td>轻小说 (Light Novel)</td><td>0.80</td><td>69%</td><td>64%</td><td>+7%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">6</div>
+    <h2>Trade-off 分析</h2>
+  </div>
+  <div class="comparison-row">
+    <div>
+      <h4 style="margin-bottom:0.3rem;font-size:0.85rem;">&#9888;&#65039; 负面影响</h4>
+      <ul style="font-size:0.8rem;">
+        <li>Token 消耗增加约 8%（自一致性检查 + 修正迭代）</li>
+        <li>响应时间从 1420ms 增至 1680ms（+18%）</li>
+        <li>误报率约 7%（将正确内容误判为错误）</li>
+        <li>复杂场景下修正迭代可能超过 3 次上限</li>
+      </ul>
+    </div>
+    <div class="col-after">
+      <h4 style="margin-bottom:0.3rem;font-size:0.85rem;">&#9989; 正面收益</h4>
+      <ul style="font-size:0.8rem;">
+        <li>负样本检测率提升 23 个百分点（45% &rarr; 68%）</li>
+        <li>Faithfulness 从 0.78 提升至 0.80</li>
+        <li>修正后的错误中 62% 成功恢复</li>
+        <li>为后续角色一致性和伏笔追踪奠定基础</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>Agent 网文续写评估平台 · ROUND 09 · 2026-06-04</p>
+  <p style="margin-top:0.3rem;">数据集: plot_coherence (520 样本) · 评估维度: 忠实度/错误检测/恢复能力</p>
+</div>
+
+</body>
+</html>

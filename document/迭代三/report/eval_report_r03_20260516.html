@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 03</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .metric-card .delta { font-size: 0.72rem; font-weight: 600; margin-left: 0.3rem; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .opt-box code { background: #f1f5f9; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.82rem; }
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .comparison-row > div { padding: 1rem; border-radius: var(--radius-sm); }
+  .col-before { background: #fff1f0; border: 1px solid #ffccc7; }
+  .col-after { background: #f6ffed; border: 1px solid #b7eb8f; }
+  .col-before h5, .col-after h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.4rem; }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  li { margin-bottom: 0.25rem; }
+  .sweet-spot { background: linear-gradient(135deg, #dbeafe, #d1fae5); border: 2px solid var(--accent); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; text-align: center; }
+  .sweet-spot h3 { font-size: 1rem; color: var(--primary); }
+  .sweet-spot .val { font-size: 1.8rem; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+  @media (max-width: 768px) { .section { padding: 1.5rem; } .comparison-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ═══ Cover ═══ -->
+<div class="cover">
+  <div class="badge">生成参数调优</div>
+  <h1>Agent 小说创作 v0.3 · 生成参数调优评估</h1>
+  <p class="sub">Temperature / Top-p / Frequency Penalty 系统调优 · 寻找忠实度与创造性的最佳平衡点</p>
+  <dl class="meta">
+    <div><dt>评估轮次</dt><dd>ROUND 03</dd></div>
+    <div><dt>版本</dt><dd>v0.3</dd></div>
+    <div><dt>日期</dt><dd>2026-05-16</dd></div>
+    <div><dt>基线版本</dt><dd>v0.2 (ROUND 02)</dd></div>
+    <div><dt>优化策略</dt><dd>生成参数系统调优</dd></div>
+  </dl>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 一、执行摘要 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">1</span><h2>执行摘要</h2></div>
+  <p>本轮优化聚焦于 <strong>生成参数校准</strong>。固定 ROUND 02 的 Genre Anchor Prompt，通过系统化调整 temperature、top_p 与 frequency_penalty 参数，在保持类型锚定效果的前提下，寻找忠实度与创造性之间的最佳平衡点。</p>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">忠实度</div>
+      <div class="value" style="color:var(--accent-green)">0.71</div>
+      <div class="sub">/ 1.0</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +0.05</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">幻觉评分</div>
+      <div class="value" style="color:var(--accent-green)">3.6</div>
+      <div class="sub">/ 5.0</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +0.1</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">创意多样性</div>
+      <div class="value" style="color:var(--accent-orange)">-8%</div>
+      <div class="sub">vs ROUND 02</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">任务成功率</div>
+      <div class="value" style="color:var(--accent-green)">82.1%</div>
+      <div class="sub">/ 240 样本</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +1.7%</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">答案相关性</div>
+      <div class="value" style="color:var(--accent-yellow)">0.72</div>
+      <div class="sub">/ 1.0</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +0.02</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">平均响应时间</div>
+      <div class="value" style="color:var(--accent-yellow)">2,052</div>
+      <div class="sub">ms</div>
+      <div class="delta" style="color:var(--accent-green);">&#9660; -35ms</div>
+    </div>
+  </div>
+
+  <div class="opt-box">
+    <h4>核心权衡分析</h4>
+    <p style="font-size:0.85rem;color:var(--text-secondary);">参数调优的核心在于权衡 <strong>忠实度 (faithfulness)</strong> 与 <strong>创造性 (creativity/diversity)</strong>。降低 temperature 从 0.9 至 0.7 使 faithfulness 提升至 0.71，但创意多样性评分下降 8%。LLM Judge 反馈指出：生成结果更"安全"但缺乏惊喜，部分场景的叙事转折趋于平淡。建议在后续迭代中探索<strong>参数动态调整策略</strong>——在简单场景使用较低 temperature 确保忠实度，在需要创意的场景适度提高温度。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 二、参数扫描结果 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">2</span><h2>参数扫描结果</h2></div>
+  <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.5rem;">对 temperature、top_p、frequency_penalty 三个参数进行了系统网格扫描。每个配置在完整 240 样本集上运行。</p>
+
+  <h3 style="font-size:0.9rem;font-weight:600;margin-bottom:0.4rem;">2.1 Temperature 单变量扫描 (top_p=0.9, freq_penalty=0 固定)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Temperature</th><th>faithfulness</th><th>answer_relevancy</th><th>task_success</th><th>hallucination</th><th>创意多样性*</th><th>综合评分</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>0.5</td>
+          <td><span style="font-weight:700;">0.73</span></td><td>0.70</td><td>80.8%</td><td><span style="font-weight:700;">3.7</span></td><td style="color:var(--accent-red);">-15%</td>
+          <td><span class="tag-grade tag-C">B-</span></td>
+        </tr>
+        <tr>
+          <td>0.6</td>
+          <td>0.72</td><td>0.71</td><td>81.7%</td><td>3.6</td><td style="color:var(--accent-orange);">-11%</td>
+          <td><span class="tag-grade tag-C">B-</span></td>
+        </tr>
+        <tr style="background:#f0f9ff;font-weight:600;">
+          <td style="color:var(--accent);font-weight:700;">0.7</td>
+          <td>0.71</td><td>0.72</td><td>82.1%</td><td>3.6</td><td>-8%</td>
+          <td><span class="tag-grade tag-B" style="font-weight:700;">B</span></td>
+        </tr>
+        <tr>
+          <td>0.8</td>
+          <td>0.68</td><td>0.71</td><td>81.3%</td><td>3.5</td><td>+2%</td>
+          <td><span class="tag-grade tag-C">B-</span></td>
+        </tr>
+        <tr>
+          <td>0.9</td>
+          <td>0.66</td><td>0.70</td><td>80.4%</td><td>3.5</td><td><span style="color:var(--accent-green);font-weight:600;">基线</span></td>
+          <td><span class="tag-grade tag-C">C+</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.72rem;color:var(--text-secondary);margin-top:0.25rem;">* 创意多样性 = LLM Judge 对生成内容新颖度与叙事多样性的综合评分, 以 temperature=0.9 为基线。</p>
+
+  <h3 style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.4rem;">2.2 多参数组合对比</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>配置</th><th>temperature</th><th>top_p</th><th>freq_penalty</th><th>faithfulness</th><th>diversity</th><th>备注</th></tr></thead>
+      <tbody>
+        <tr><td>基线 (R02)</td><td>0.9</td><td>0.95</td><td>0.0</td><td>0.66</td><td>基线</td><td>默认配置</td></tr>
+        <tr><td>Config-A</td><td>0.7</td><td>0.95</td><td>0.0</td><td>0.70</td><td>-6%</td><td>仅降温度</td></tr>
+        <tr style="background:#f0f9ff;font-weight:600;">
+          <td style="color:var(--accent);">Config-B</td><td>0.7</td><td>0.90</td><td>0.3</td><td>0.71</td><td>-8%</td>
+          <td><span style="color:var(--accent-green);">&#10003; 最优选</span></td>
+        </tr>
+        <tr><td>Config-C</td><td>0.7</td><td>0.85</td><td>0.5</td><td>0.72</td><td>-14%</td><td>多样性损失过大</td></tr>
+        <tr><td>Config-D</td><td>0.6</td><td>0.90</td><td>0.3</td><td>0.72</td><td>-12%</td><td>多样性偏低</td></tr>
+        <tr><td>Config-E</td><td>0.8</td><td>0.90</td><td>0.2</td><td>0.69</td><td>0%</td><td>忠实度不足</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sweet-spot">
+    <h3>最优参数配置</h3>
+    <div class="val">temperature = 0.7</div>
+    <div style="color:var(--text-secondary);font-size:0.85rem;margin-top:0.3rem;">
+      top_p = 0.90 · frequency_penalty = 0.3
+    </div>
+    <div style="color:var(--text-secondary);font-size:0.78rem;margin-top:0.5rem;">
+      faithfulness 0.66 &#8594; 0.71 (+7.6%) · 创意多样性 -8% (可接受范围内)
+    </div>
+  </div>
+
+  <p style="font-size:0.82rem;color:var(--text-secondary);">temperature=0.7 为忠实度与创造性的最佳折中点。top_p 从 0.95 下调至 0.90 进一步收窄采样空间，配合 frequency_penalty=0.3 抑制 Token 级重复，在不显著牺牲多样性的前提下有效控制了幻觉率。Config-C 虽然 faithfulness 更高 (0.72)，但多样性 -14% 的代价对小说创作场景不可接受。</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 三、分类型影响分析 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">3</span><h2>分类型影响分析</h2></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>类型</th><th>R02 faithfulness</th><th>R03 faithfulness</th><th>变化</th><th>创意多样性变化</th></tr></thead>
+      <tbody>
+        <tr><td>仙侠 / 修真</td><td>0.75</td><td>0.78</td><td><span style="color:var(--accent-green);font-weight:600;">+0.03</span></td><td style="color:var(--accent-orange);">-5%</td></tr>
+        <tr><td>都市 / 现代</td><td>0.73</td><td>0.76</td><td><span style="color:var(--accent-green);font-weight:600;">+0.03</span></td><td style="color:var(--accent-orange);">-4%</td></tr>
+        <tr><td>西方奇幻</td><td>0.71</td><td>0.74</td><td><span style="color:var(--accent-green);font-weight:600;">+0.03</span></td><td style="color:var(--accent-orange);">-7%</td></tr>
+        <tr><td>玄幻</td><td>0.72</td><td>0.75</td><td><span style="color:var(--accent-green);font-weight:600;">+0.03</span></td><td style="color:var(--accent-orange);">-6%</td></tr>
+        <tr><td>历史 / 架空历史</td><td>0.48</td><td>0.56</td><td><span style="color:var(--accent-green);font-weight:600;">+0.08</span></td><td style="color:var(--accent-orange);">-12%</td></tr>
+        <tr><td>科幻</td><td>0.52</td><td>0.59</td><td><span style="color:var(--accent-green);font-weight:600;">+0.07</span></td><td style="color:var(--accent-orange);">-11%</td></tr>
+        <tr><td>悬疑 / 推理</td><td>0.60</td><td>0.65</td><td><span style="color:var(--accent-green);font-weight:600;">+0.05</span></td><td style="color:var(--accent-orange);">-10%</td></tr>
+        <tr><td>轻小说 / 游戏</td><td>0.74</td><td>0.77</td><td><span style="color:var(--accent-green);font-weight:600;">+0.03</span></td><td style="color:var(--accent-orange);">-3%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="opt-box">
+    <h4>类型间差异解读</h4>
+    <ul>
+      <li><strong>历史与科幻受益最大：</strong>faithfulness 分别提升 0.08 和 0.07，降低 temperature 有效减少了"发散式"的设定冲突，Agent 更倾向于遵循已知的历史/科学事实。</li>
+      <li><strong>多样性损失呈现类型敏感性：</strong>历史 (-12%) 和科幻 (-11%) 的多样性下降最为明显——低温度使得生成结果趋于"保守"，在这两类需要一定想象力的场景中显得平淡。</li>
+      <li><strong>轻小说类影响最小：</strong>多样性仅 -3%，因其叙事范式本身较为固定（系统流、升级流），低温度反而使套路一致性更好。</li>
+      <li>这一发现表明 <strong>参数动态配置</strong> 的必要性：不同类型可能需要不同的 optimal temperature 设置。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 四、迭代指标走势 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" style="border-bottom:none;">
+  <div class="section-header"><span class="num">4</span><h2>指标迭代走势</h2></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>指标</th><th>R01 (v0.1)</th><th>R02 (v0.2)</th><th>R03 (v0.3)</th><th>R01&#8594;R03 变化</th></tr></thead>
+      <tbody>
+        <tr><td>task_success</td><td>76.7%</td><td>80.4%</td><td>82.1%</td><td><span style="color:var(--accent-green);font-weight:600;">+5.4%</span></td></tr>
+        <tr><td>faithfulness</td><td>0.58</td><td>0.66</td><td>0.71</td><td><span style="color:var(--accent-green);font-weight:600;">+0.13</span></td></tr>
+        <tr><td>answer_relevancy</td><td>0.62</td><td>0.70</td><td>0.72</td><td><span style="color:var(--accent-green);font-weight:600;">+0.10</span></td></tr>
+        <tr><td>context_recall</td><td>0.55</td><td>0.59</td><td>0.61</td><td><span style="color:var(--accent-green);font-weight:600;">+0.06</span></td></tr>
+        <tr><td>hallucination (/5)</td><td>3.2</td><td>3.5</td><td>3.6</td><td><span style="color:var(--accent-green);font-weight:600;">+0.4</span></td></tr>
+        <tr><td>response_time (ms)</td><td>2,104</td><td>2,087</td><td>2,052</td><td><span style="color:var(--accent-green);font-weight:600;">-52ms</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="opt-box">
+    <h4>ROUND 03 小结</h4>
+    <p style="font-size:0.85rem;color:var(--text-secondary);">参数调优在 faithfulness 维度上取得了显著增益 (0.66 &#8594; 0.71)，但暴露出忠实度与创造性之间的结构性矛盾。temperature=0.7 被确定为当前的最优平衡点，但历史 (0.56) 和科幻 (0.59) 类型的 faithfulness 仍低于 0.60 的可接受线。创意多样性的下降是小说创作场景需要严肃权衡的问题——过于"安全"的生成本身也是一种质量损失。<strong>下轮建议聚焦上下文窗口管理</strong>，从根本上解决长上下文场景的质量退化与延迟瓶颈。</p>
+  </div>
+</div>
+
+<!-- ═══ Footer ═══ -->
+<div class="footer">
+  <strong>Agent 评估平台</strong> · ROUND 03 生成参数调优 · v0.3<br>
+  生成日期：2026-05-16 · 基于 ROUND 02 Prompt 优化成果<br>
+  <span style="font-size:0.72rem;">Confidential — Eval Platform Internal Use</span>
+</div>
+
+</body>
+</html>

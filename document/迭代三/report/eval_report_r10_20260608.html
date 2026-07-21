@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 10</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .comparison-row > div { padding: 1rem; border-radius: var(--radius-sm); background: #fff1f0; border: 1px solid #ffccc7; }
+  .comparison-row .col-after { background: #f6ffed; border: 1px solid #b7eb8f; }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="badge">迭代二 · 长文连贯性</div>
+  <h1>Agent 网文续写评估报告</h1>
+  <p class="sub">ROUND 10 — 长文连贯性与伏笔增强 v0.10 | 2026-06-08</p>
+  <dl class="meta">
+    <div><dt>数据集</dt><dd>plot_coherence (520) + foreshadowing (370 新增)</dd></div>
+    <div><dt>模型</dt><dd>Claude 4.5 Sonnet (基线) + Prompt v0.10</dd></div>
+    <div><dt>优化焦点</dt><dd>伏笔追踪 · 情节连贯性</dd></div>
+    <div><dt>评估日期</dt><dd>2026-06-08</dd></div>
+  </dl>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">1</div>
+    <h2>本轮优化概要</h2>
+  </div>
+  <p>ROUND 10 引入了<strong>"伏笔追踪模块"</strong>——一套专为长文本场景设计的情节元素追踪系统。该模块维护一张动态更新的"伏笔-回收"关系表，记录每个未回收的伏笔、已回收伏笔的上下文位置、以及关键情节元素的引用链。配合 R09 的错误检测机制，实现了从"被动纠错"到"主动编织"的跃升。</p>
+  <ul>
+    <li><strong>伏笔追踪模块</strong> — 动态维护 伏笔-回收 关系图谱</li>
+    <li><strong>关键情节追踪</strong> — 记录核心事件、转折点的前后引用</li>
+    <li><strong>结构性连贯检查</strong> — 评估段落/章节间的逻辑流畅度</li>
+    <li><strong>新增数据集</strong> — 伏笔评估专用数据集，370 样本覆盖 8 类 Genre</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">2</div>
+    <h2>核心指标对比</h2>
+  </div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">叙事连贯性</div>
+      <div class="value" style="color:var(--accent-green);">0.83</div>
+      <div class="sub">前轮: 0.78 <span style="color:var(--accent-green);">&#9650; +0.05</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">伏笔召回率</div>
+      <div class="value" style="color:var(--accent-green);">0.76</div>
+      <div class="sub">前轮: 0.65 <span style="color:var(--accent-green);">&#9650; +0.11</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">忠实度</div>
+      <div class="value" style="color:var(--accent-green);">0.81</div>
+      <div class="sub">前轮: 0.80 <span style="color:var(--accent-green);">&#9650; +0.01</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">伏笔有效回收率</div>
+      <div class="value" style="color:var(--accent-green);">72%</div>
+      <div class="sub">前轮: 58% <span style="color:var(--accent-green);">&#9650; +14pp</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">3</div>
+    <h2>伏笔追踪机制详解</h2>
+  </div>
+  <div class="opt-box">
+    <h4>伏笔追踪模块工作流程</h4>
+    <ol style="font-size:0.82rem;">
+      <li><strong>伏笔注册</strong> — 解析输入文本中的潜在伏笔（异常事件、特殊物品、神秘对话等），登记至"未回收伏笔表"</li>
+      <li><strong>上下文追踪</strong> — 在每次续写时扫描前文伏笔表，判断是否有可回收的伏笔点</li>
+      <li><strong>回收触发</strong> — 当续写内容命中某个伏笔的预期回收窗口时，自动提示 Agent 进行回扣</li>
+      <li><strong>关系图谱更新</strong> — 已回收的伏笔移入"已回收表"，记录回收位置与方式；未回收的持续累积活跃度权重</li>
+      <li><strong>遗忘衰减</strong> — 超出最大合理回收距离的伏笔获得高亮提醒，防止丢失</li>
+    </ol>
+  </div>
+  <table style="width:100%;border-collapse:collapse;font-size:0.8rem;margin:1rem 0;">
+    <tr style="background:#f1f5f9;">
+      <td style="padding:0.5rem 1rem;border:1px solid var(--border);font-weight:600;">输入 Token 示例</td>
+      <td style="padding:0.5rem 1rem;border:1px solid var(--border);">"萧尘接过玉佩时，感到一丝微弱的灵力波动，但并未在意。"</td>
+    </tr>
+    <tr>
+      <td style="padding:0.5rem 1rem;border:1px solid var(--border);font-weight:600;">伏笔注册</td>
+      <td style="padding:0.5rem 1rem;border:1px solid var(--border);">[FP-001] 玉佩灵力波动 &rarr; 类型: 物品伏笔 / 预期回收窗口: 300-800 tokens / 状态: 待回收</td>
+    </tr>
+    <tr style="background:#f1f5f9;">
+      <td style="padding:0.5rem 1rem;border:1px solid var(--border);font-weight:600;">回收触发</td>
+      <td style="padding:0.5rem 1rem;border:1px solid var(--border);">续写 520 tokens 后主角遇险 &rarr; 触发玉佩护主回收</td>
+    </tr>
+    <tr>
+      <td style="padding:0.5rem 1rem;border:1px solid var(--border);font-weight:600;">回收结果</td>
+      <td style="padding:0.5rem 1rem;border:1px solid var(--border);">"玉佩骤然发出耀眼光芒，一道屏障在萧尘身前展开——正是当初那缕微弱的灵力波动在此刻彻底激活。"</td>
+    </tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">4</div>
+    <h2>伏笔指标 — Genre 分项</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Genre</th>
+          <th>伏笔召回率 (前)</th>
+          <th>伏笔召回率 (后)</th>
+          <th>变化</th>
+          <th>叙事连贯性</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>悬疑 (Mystery)</td><td>0.58</td><td>0.72</td><td><span style="color:var(--accent-green);font-weight:600;">&#9650; +0.14</span></td><td>0.81</td></tr>
+        <tr><td>仙侠 (Xianxia)</td><td>0.62</td><td>0.73</td><td><span style="color:var(--accent-green);font-weight:600;">&#9650; +0.11</span></td><td>0.84</td></tr>
+        <tr><td>奇幻 (Xuanhuan)</td><td>0.60</td><td>0.70</td><td><span style="color:var(--accent-green);">&#9650; +0.10</span></td><td>0.83</td></tr>
+        <tr><td>玄幻 (Fantasy)</td><td>0.63</td><td>0.72</td><td><span style="color:var(--accent-green);">&#9650; +0.09</span></td><td>0.85</td></tr>
+        <tr><td>历史 (Historical)</td><td>0.55</td><td>0.64</td><td><span style="color:var(--accent-green);">&#9650; +0.09</span></td><td>0.80</td></tr>
+        <tr><td>都市 (Urban)</td><td>0.68</td><td>0.76</td><td><span style="color:var(--accent-green);">&#9650; +0.08</span></td><td>0.82</td></tr>
+        <tr><td>科幻 (Sci-Fi)</td><td>0.70</td><td>0.78</td><td><span style="color:var(--accent-green);">&#9650; +0.08</span></td><td>0.84</td></tr>
+        <tr><td>轻小说 (Light Novel)</td><td>0.66</td><td>0.74</td><td><span style="color:var(--accent-green);">&#9650; +0.08</span></td><td>0.83</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;">* 悬疑 Genre 获得最大提升 (+0.14)，因其天然依赖伏笔-回收结构；仙侠次之 (+0.11)，受益于丹药/法宝/境界等可追踪元素的密集出现。</p>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">5</div>
+    <h2>跨数据集验证</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>数据集</th>
+          <th>指标</th>
+          <th>前轮</th>
+          <th>本轮</th>
+          <th>变化</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>plot_coherence (520)</td><td>叙事连贯性</td><td>0.78</td><td>0.83</td><td><span style="color:var(--accent-green);">&#9650; +0.05</span></td></tr>
+        <tr><td>plot_coherence (520)</td><td>忠实度</td><td>0.80</td><td>0.81</td><td><span style="color:var(--accent-green);">&#9650; +0.01</span></td></tr>
+        <tr><td>foreshadowing (370)</td><td>伏笔召回率</td><td>0.65</td><td>0.76</td><td><span style="color:var(--accent-green);">&#9650; +0.11</span></td></tr>
+        <tr><td>foreshadowing (370)</td><td>伏笔有效回收率</td><td>58%</td><td>72%</td><td><span style="color:var(--accent-green);">&#9650; +14pp</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">6</div>
+    <h2>残差分析 &amp; 改进方向</h2>
+  </div>
+  <ul>
+    <li><strong>长距离伏笔召回不足</strong> — 超过 2000 tokens 的伏笔召回率降至 0.58，需改进记忆衰减机制</li>
+    <li><strong>多伏笔交织场景</strong> — 同时活跃 5 个以上伏笔时，回收优先级排序准确率下降</li>
+    <li><strong>隐式伏笔识别困难</strong> — 非显式的暗示性伏笔（如环境描写中的隐喻）识别率仅 41%</li>
+    <li><strong>Token 开销</strong> — 伏笔表维护额外增加约 5% 的上下文窗口占用</li>
+  </ul>
+</div>
+
+<div class="footer">
+  <p>Agent 网文续写评估平台 · ROUND 10 · 2026-06-08</p>
+  <p style="margin-top:0.3rem;">数据集: plot_coherence (520) + foreshadowing (370) · 评估维度: 连贯性/伏笔/忠实度</p>
+</div>
+
+</body>
+</html>

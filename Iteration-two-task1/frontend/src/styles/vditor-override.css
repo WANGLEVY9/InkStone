@@ -1,0 +1,219 @@
+/* ============================================================
+   Vditor override · 砚台丹青
+   ----------------------------------------------------------------
+   Repaint the third-party Markdown editor as a sheet of xuan paper.
+   Selectors target the public Vditor DOM; some need !important
+   because Vditor's own styles use them.
+   ============================================================ */
+
+/* ----- Outer shell ----- */
+.vditor {
+  background: var(--paper-elevated) !important;
+  border: 1px solid var(--silk-line) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-body) !important;
+  color: var(--ink-heavy) !important;
+}
+
+/* ----- Toolbar ----- */
+.vditor-toolbar {
+  background: var(--paper-base) !important;
+  border-bottom: 1px solid var(--silk-line) !important;
+}
+.vditor-toolbar__item {
+  color: var(--ink-medium) !important;
+}
+.vditor-toolbar__item:hover {
+  color: var(--vermilion) !important;
+  background: var(--paper-sunken) !important;
+}
+
+/* ----- Content area (covers IR / WYSIWYG / SV / preview) ----- */
+.vditor-ir,
+.vditor-sv,
+.vditor-wysiwyg,
+.vditor-preview,
+.vditor-reset {
+  background: var(--paper-elevated) !important;
+  color: var(--ink-heavy) !important;
+  font-family: var(--font-body) !important;
+  font-size: 16px !important;
+  line-height: 1.9 !important;
+}
+
+.vditor-ir pre.vditor-reset,
+.vditor-wysiwyg pre.vditor-reset,
+.vditor-sv,
+.vditor-reset {
+  padding: 24px 28px !important;
+}
+
+/* ----- Headings: serif + vermilion accent on h1 ----- */
+.vditor-reset h1::before,
+.vditor-reset h2::before,
+.vditor-reset h3::before,
+.vditor-reset h4::before,
+.vditor-reset h5::before,
+.vditor-reset h6::before {
+  display: none !important;
+}
+.vditor-reset h1,
+.vditor-reset h2,
+.vditor-reset h3,
+.vditor-reset h4,
+.vditor-reset h5,
+.vditor-reset h6 {
+  font-family: var(--font-display) !important;
+  color: var(--ink-heavy) !important;
+  font-weight: 700 !important;
+  border-bottom: none !important;
+  letter-spacing: 0.02em;
+}
+.vditor-reset h1 {
+  position: relative;
+  padding-left: 14px;
+  border-left: 4px solid var(--vermilion);
+  font-size: 1.8em !important;
+  margin-top: 1.6em !important;
+  margin-bottom: 0.7em !important;
+}
+.vditor-reset h2 {
+  font-size: 1.4em !important;
+  margin-top: 1.4em !important;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--silk-line) !important;
+}
+.vditor-reset h3 {
+  font-size: 1.18em !important;
+  color: var(--ink-medium) !important;
+}
+
+/* ----- Paragraphs and inline ----- */
+.vditor-reset p {
+  color: var(--ink-heavy) !important;
+}
+.vditor-reset blockquote {
+  border-left: 3px solid var(--vermilion) !important;
+  background: var(--vermilion-bg) !important;
+  color: var(--ink-medium) !important;
+  padding: 8px 14px !important;
+  margin: 1.2em 0 !important;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.vditor-reset a {
+  color: var(--vermilion) !important;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.vditor-reset a:hover {
+  color: var(--vermilion-deep) !important;
+}
+.vditor-reset strong {
+  color: var(--ink-heavy) !important;
+  font-weight: 700;
+}
+.vditor-reset em {
+  color: var(--ink-medium) !important;
+}
+
+/* ----- Code: paper-sunken + mono ----- */
+.vditor-reset code,
+.vditor-reset pre {
+  font-family: var(--font-mono) !important;
+}
+.vditor-reset code:not(.hljs):not(.highlight-chroma) {
+  background: var(--paper-sunken) !important;
+  color: var(--ink-heavy) !important;
+  padding: 1px 6px !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.9em !important;
+  border: 1px solid var(--silk-line);
+}
+.vditor-reset pre {
+  background: var(--paper-sunken) !important;
+  border: 1px solid var(--silk-line) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 14px 16px !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+}
+.vditor-reset pre code {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* ----- Lists ----- */
+.vditor-reset ul,
+.vditor-reset ol {
+  padding-left: 1.6em !important;
+}
+.vditor-reset li {
+  margin: 0.3em 0 !important;
+}
+
+/* ----- Tables ----- */
+.vditor-reset table {
+  border-collapse: collapse !important;
+  border: 1px solid var(--silk-line-strong) !important;
+}
+.vditor-reset table th {
+  background: var(--paper-sunken) !important;
+  color: var(--ink-heavy) !important;
+  font-family: var(--font-display) !important;
+  border: 1px solid var(--silk-line-strong) !important;
+}
+.vditor-reset table td {
+  border: 1px solid var(--silk-line) !important;
+}
+
+/* ----- Horizontal rule: vermilion thread ----- */
+.vditor-reset hr {
+  border: none !important;
+  height: 1px !important;
+  background: var(--silk-line-strong) !important;
+  margin: 2em 0 !important;
+}
+
+/* ----- Counter at the bottom ----- */
+.vditor-counter {
+  background: var(--paper-base) !important;
+  color: var(--ink-light) !important;
+  border-top: 1px solid var(--silk-line) !important;
+  font-family: var(--font-display) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.05em;
+}
+
+/* ----- Selection: vermilion ink wash ----- */
+.vditor-reset ::selection,
+.vditor-ir ::selection,
+.vditor-sv ::selection,
+.vditor-wysiwyg ::selection {
+  background: var(--vermilion-bg);
+  color: var(--vermilion-deep);
+}
+
+/* ----- Outline panel ----- */
+.vditor-outline {
+  background: var(--paper-base) !important;
+  border-left: 1px solid var(--silk-line) !important;
+  font-family: var(--font-display) !important;
+  color: var(--ink-medium) !important;
+}
+.vditor-outline__action--current {
+  background: var(--vermilion-bg) !important;
+  color: var(--vermilion-deep) !important;
+}
+
+/* ----- Wrapper around the editor (so it inherits parent radius cleanly) ----- */
+.vditor-wrapper .vditor {
+  height: auto;
+}
+
+/* ----- Fullscreen mode: lift above IconSidebar (z-index 100) ----- */
+.vditor--fullscreen {
+  z-index: 999 !important;
+}

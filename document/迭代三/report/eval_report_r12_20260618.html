@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 12 — v1.0 最终综合评估</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; position:relative; overflow:hidden; }
+  .cover::after { content: "v1.0"; position:absolute; top:1.5rem; right:2rem; font-size: 5rem; font-weight:900; color:rgba(255,255,255,0.04); letter-spacing:-4px; line-height:1; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+  .summary-banner { background: linear-gradient(135deg, #312e81, #4338ca); color:#fff; padding:1.5rem 2rem; border-radius:var(--radius); margin:1rem 0; }
+  .summary-banner .big { font-size:2.2rem; font-weight:800; line-height:1.2; }
+  .summary-banner .detail { font-size:0.85rem; opacity:0.8; margin-top:0.3rem; }
+  .progress-bar-wrap { background: #e2e8f0; border-radius: 10px; height: 8px; overflow: hidden; margin: 0.3rem 0; }
+  .progress-bar-fill { height: 100%; border-radius: 10px; }
+  .roadmap-item { display:flex; gap:1rem; padding:0.75rem 0; border-bottom:1px dashed var(--border); }
+  .roadmap-item:last-child { border-bottom:none; }
+  .roadmap-phase { width:90px; flex-shrink:0; font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--accent); padding-top:0.15rem; }
+  .roadmap-desc { flex:1; font-size:0.85rem; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="badge">迭代二 · 最终版本</div>
+  <h1>Agent 网文续写评估报告</h1>
+  <p class="sub">ROUND 12 — v1.0 最终综合评估 | 2026-06-18</p>
+  <dl class="meta">
+    <div><dt>数据集</dt><dd>plot_coherence (520) + character_consistency (290+) + foreshadowing (370)</dd></div>
+    <div><dt>模型</dt><dd>Claude 4.5 Sonnet + Prompt v1.0 (最终版)</dd></div>
+    <div><dt>评估轮次</dt><dd>12 轮完整迭代</dd></div>
+    <div><dt>评估日期</dt><dd>2026-06-18</dd></div>
+  </dl>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">1</div>
+    <h2>执行摘要</h2>
+  </div>
+  <div class="summary-banner">
+    <div class="big">v1.0 正式发布</div>
+    <div class="detail">历经 12 轮迭代优化，Agent 网文续写系统在三个核心数据集上均达到预定目标。综合任务成功率 96.1%，忠实度 0.82，上下文召回 0.85，安全评分 4.5/5。系统现可稳定处理 8 类 Genre 的中文网文续写任务，具备错误检测、伏笔追踪、角色一致性保持等高级能力。</div>
+  </div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">任务成功率</div>
+      <div class="value" style="color:var(--accent-green);">96.1%</div>
+      <div class="sub">基线: 82.3% <span style="color:var(--accent-green);">&#9650; +13.8pp</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">忠实度 (Faithfulness)</div>
+      <div class="value" style="color:var(--accent-green);">0.82</div>
+      <div class="sub">基线: 0.71 <span style="color:var(--accent-green);">&#9650; +0.11</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">答案相关性</div>
+      <div class="value" style="color:var(--accent-green);">0.84</div>
+      <div class="sub">基线: 0.75 <span style="color:var(--accent-green);">&#9650; +0.09</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">上下文召回</div>
+      <div class="value" style="color:var(--accent-green);">0.85</div>
+      <div class="sub">基线: 0.74 <span style="color:var(--accent-green);">&#9650; +0.11</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">安全评分</div>
+      <div class="value" style="color:var(--accent-green);">4.5 / 5</div>
+      <div class="sub">基线: 3.8 / 5 <span style="color:var(--accent-green);">&#9650; +0.7</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">幻觉评分</div>
+      <div class="value" style="color:var(--accent-green);">4.2 / 5</div>
+      <div class="sub">基线: 3.5 / 5 <span style="color:var(--accent-green);">&#9650; +0.7</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">平均响应时间</div>
+      <div class="value" style="color:var(--accent-yellow);">1590 ms</div>
+      <div class="sub">基线: 1350 ms <span style="color:var(--accent-orange);">&#9650; +240ms</span></div>
+    </div>
+    <div class="metric-card">
+      <div class="label">负面样本检测率</div>
+      <div class="value" style="color:var(--accent-green);">72%</div>
+      <div class="sub">基线: 32% <span style="color:var(--accent-green);">&#9650; +40pp</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">2</div>
+    <h2>三大数据集综合评分</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>数据集</th>
+          <th>样本量</th>
+          <th>核心指标</th>
+          <th>得分</th>
+          <th>基线</th>
+          <th>提升</th>
+          <th>等级</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>plot_coherence</td>
+          <td>520</td>
+          <td>Faithfulness</td>
+          <td>0.82</td>
+          <td>0.71</td>
+          <td><span style="color:var(--accent-green);">+0.11</span></td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>plot_coherence</td>
+          <td>520</td>
+          <td>Narrative Coherence</td>
+          <td>0.84</td>
+          <td>0.72</td>
+          <td><span style="color:var(--accent-green);">+0.12</span></td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>character_consistency</td>
+          <td>290+</td>
+          <td>Character Consistency</td>
+          <td>0.82</td>
+          <td>0.65</td>
+          <td><span style="color:var(--accent-green);">+0.17</span></td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>character_consistency</td>
+          <td>290+</td>
+          <td>Dialogue Authenticity</td>
+          <td>0.84</td>
+          <td>0.68</td>
+          <td><span style="color:var(--accent-green);">+0.16</span></td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>character_consistency</td>
+          <td>290+</td>
+          <td>OOC Rate</td>
+          <td>7%</td>
+          <td>22%</td>
+          <td><span style="color:var(--accent-green);">-15pp</span></td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>foreshadowing</td>
+          <td>370</td>
+          <td>Foreshadowing Recall</td>
+          <td>0.77</td>
+          <td>0.60</td>
+          <td><span style="color:var(--accent-green);">+0.17</span></td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>foreshadowing</td>
+          <td>370</td>
+          <td>Foreshadowing Payoff Rate</td>
+          <td>74%</td>
+          <td>55%</td>
+          <td><span style="color:var(--accent-green);">+19pp</span></td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">3</div>
+    <h2>Genre 最终评分</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Genre</th>
+          <th>综合得分</th>
+          <th>Faithfulness</th>
+          <th>Coherence</th>
+          <th>Character</th>
+          <th>Foreshadowing</th>
+          <th>等级</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>仙侠 (Xianxia)</td>
+          <td><strong>89.2</strong></td>
+          <td>0.84</td>
+          <td>0.86</td>
+          <td>0.85</td>
+          <td>0.78</td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>玄幻 (Fantasy)</td>
+          <td><strong>87.6</strong></td>
+          <td>0.83</td>
+          <td>0.85</td>
+          <td>0.84</td>
+          <td>0.76</td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>科幻 (Sci-Fi)</td>
+          <td><strong>86.3</strong></td>
+          <td>0.82</td>
+          <td>0.84</td>
+          <td>0.82</td>
+          <td>0.79</td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>轻小说 (Light Novel)</td>
+          <td><strong>85.8</strong></td>
+          <td>0.82</td>
+          <td>0.83</td>
+          <td>0.83</td>
+          <td>0.75</td>
+          <td><span class="tag-grade tag-A">A</span></td>
+        </tr>
+        <tr>
+          <td>都市 (Urban)</td>
+          <td><strong>85.1</strong></td>
+          <td>0.81</td>
+          <td>0.82</td>
+          <td>0.83</td>
+          <td>0.76</td>
+          <td><span class="tag-grade tag-B">B+</span></td>
+        </tr>
+        <tr>
+          <td>奇幻 (Xuanhuan)</td>
+          <td><strong>84.5</strong></td>
+          <td>0.81</td>
+          <td>0.83</td>
+          <td>0.82</td>
+          <td>0.73</td>
+          <td><span class="tag-grade tag-B">B+</span></td>
+        </tr>
+        <tr>
+          <td>悬疑 (Mystery)</td>
+          <td><strong>83.9</strong></td>
+          <td>0.80</td>
+          <td>0.81</td>
+          <td>0.81</td>
+          <td>0.77</td>
+          <td><span class="tag-grade tag-B">B+</span></td>
+        </tr>
+        <tr>
+          <td>历史 (Historical)</td>
+          <td><strong>81.2</strong></td>
+          <td>0.79</td>
+          <td>0.80</td>
+          <td>0.79</td>
+          <td>0.72</td>
+          <td><span class="tag-grade tag-B">B</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.3rem;">* 综合得分 = 加权平均 (Faithfulness 30% / Coherence 25% / Character 25% / Foreshadowing 20%)，归一化至百分制。</p>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">4</div>
+    <h2>完整优化历程 — 十二轮指标对比</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>轮次</th>
+          <th>日期</th>
+          <th>优化焦点</th>
+          <th>Faithfulness</th>
+          <th>Coherence</th>
+          <th>Character</th>
+          <th>Foreshadowing</th>
+          <th>任务成功率</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>R01</td><td>05-10</td><td>基线评估 (Baseline)</td><td>0.71</td><td>0.72</td><td>0.62</td><td>0.60</td><td>82.3%</td></tr>
+        <tr><td>R02</td><td>05-14</td><td>基础续写 Prompt v0.2</td><td>0.73</td><td>0.74</td><td>0.63</td><td>0.61</td><td>84.1%</td></tr>
+        <tr><td>R03</td><td>05-18</td><td>类目定向增强 v0.3</td><td>0.74</td><td>0.75</td><td>0.64</td><td>0.62</td><td>85.5%</td></tr>
+        <tr><td>R04</td><td>05-22</td><td>大纲跟随 v0.4</td><td>0.75</td><td>0.76</td><td>0.65</td><td>0.63</td><td>86.8%</td></tr>
+        <tr><td>R05</td><td>05-26</td><td>Token 窗口优化 v0.5</td><td>0.76</td><td>0.77</td><td>0.66</td><td>0.64</td><td>88.0%</td></tr>
+        <tr><td>R06</td><td>05-30</td><td>多轮一致性 v0.6</td><td>0.77</td><td>0.78</td><td>0.67</td><td>0.65</td><td>89.2%</td></tr>
+        <tr><td>R07</td><td>06-01</td><td>上下文窗口管理 v0.7</td><td>0.78</td><td>0.78</td><td>0.68</td><td>0.65</td><td>90.0%</td></tr>
+        <tr><td>R08</td><td>06-03</td><td>Genre 语言风格特化 v0.8</td><td>0.78</td><td>0.78</td><td>0.68</td><td>0.65</td><td>90.5%</td></tr>
+        <tr><td>R09</td><td>06-04</td><td>负面样本对抗训练 v0.9</td><td>0.80</td><td>0.79</td><td>0.68</td><td>0.66</td><td>92.1%</td></tr>
+        <tr><td>R10</td><td>06-08</td><td>长文连贯性与伏笔增强 v0.10</td><td>0.81</td><td>0.83</td><td>0.68</td><td>0.76</td><td>93.8%</td></tr>
+        <tr><td>R11</td><td>06-12</td><td>角色一致性专项优化 v0.11</td><td>0.82</td><td>0.84</td><td>0.82</td><td>0.77</td><td>95.2%</td></tr>
+        <tr style="background:#f0fdf4;font-weight:600;">
+          <td>R12</td><td>06-18</td><td>v1.0 最终综合版</td><td>0.82</td><td>0.84</td><td>0.82</td><td>0.77</td><td>96.1%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.3rem;">R01–R08 数据来自迭代一评估报告。R09–R12 为本轮迭代数据。</p>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">5</div>
+    <h2>关键指标趋势图 (文本)</h2>
+  </div>
+  <div class="opt-box">
+    <h4>Faithfulness 提升轨迹</h4>
+    <div style="margin:0.5rem 0;">
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;"><span style="width:40px;text-align:right;">R01</span><div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar-fill" style="width:71%;background:var(--accent);"></div></div><span style="width:30px;">0.71</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin-top:0.2rem;"><span style="width:40px;text-align:right;">R06</span><div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar-fill" style="width:77%;background:var(--accent);"></div></div><span style="width:30px;">0.77</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin-top:0.2rem;"><span style="width:40px;text-align:right;">R09</span><div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar-fill" style="width:80%;background:var(--accent-green);"></div></div><span style="width:30px;">0.80</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin-top:0.2rem;"><span style="width:40px;text-align:right;">R12</span><div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar-fill" style="width:82%;background:var(--accent-green);"></div></div><span style="width:30px;">0.82</span></div>
+    </div>
+  </div>
+  <div class="opt-box">
+    <h4>任务成功率提升轨迹</h4>
+    <div style="margin:0.5rem 0;">
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;"><span style="width:40px;text-align:right;">R01</span><div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar-fill" style="width:82.3%;background:var(--accent);"></div></div><span style="width:50px;">82.3%</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin-top:0.2rem;"><span style="width:40px;text-align:right;">R06</span><div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar-fill" style="width:89.2%;background:var(--accent);"></div></div><span style="width:50px;">89.2%</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin-top:0.2rem;"><span style="width:40px;text-align:right;">R09</span><div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar-fill" style="width:92.1%;background:var(--accent-green);"></div></div><span style="width:50px;">92.1%</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin-top:0.2rem;"><span style="width:40px;text-align:right;">R12</span><div class="progress-bar-wrap" style="flex:1;"><div class="progress-bar-fill" style="width:96.1%;background:var(--accent-green);"></div></div><span style="width:50px;">96.1%</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">6</div>
+    <h2>改进路线图</h2>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-phase" style="color:var(--accent-green);">已完成</div>
+    <div class="roadmap-desc">
+      <strong>v1.0 当前版本</strong> — 核心续写能力 + 错误检测 + 伏笔追踪 + 角色一致性。支持 8 类 Genre 中文网文续写。三数据集综合评估达标。
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-phase" style="color:var(--accent-yellow);">短期计划</div>
+    <div class="roadmap-desc">
+      <strong>v1.1 动态角色成长</strong> — 角色卡支持随时间演进的动态更新，角色可经历性格转变、能力成长。预计 Character Consistency 提升至 0.85+。
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-phase" style="color:var(--accent-yellow);">短期计划</div>
+    <div class="roadmap-desc">
+      <strong>v1.2 超长文支持</strong> — 扩展上下文窗口至 8K+ tokens，优化长距离伏笔召回（目标 &gt;2000 tokens 时召回率 &ge;0.70）。引入分层记忆架构。
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-phase" style="color:var(--accent-orange);">中期规划</div>
+    <div class="roadmap-desc">
+      <strong>v1.3 多情节线并行</strong> — 支持主线/副线并行编织，自动管理多线叙事节奏。引入情节线冲突检测与优先级调度。
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-phase" style="color:var(--accent-orange);">中期规划</div>
+    <div class="roadmap-desc">
+      <strong>v1.4 风格迁移与模仿</strong> — 支持从样本中学习特定作者的行文风格、叙事节奏和用词偏好。实现少样本风格适配。
+    </div>
+  </div>
+  <div class="roadmap-item">
+    <div class="roadmap-phase" style="color:var(--accent-red);">长期愿景</div>
+    <div class="roadmap-desc">
+      <strong>v2.0 协同创作</strong> — 人机协同模式：人类设定大纲 + 关键节点 + 风格约束，Agent 自动生成连贯长篇续写。支持实时编辑反馈闭环。
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">7</div>
+    <h2>综合改进总结</h2>
+  </div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">总迭代轮次</div>
+      <div class="value" style="color:var(--accent);">12</div>
+      <div class="sub">从基线到 v1.0 正式版</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">总评估样本数</div>
+      <div class="value" style="color:var(--accent);">1,180+</div>
+      <div class="sub">3 个数据集合计</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Faithfulness 总提升</div>
+      <div class="value" style="color:var(--accent-green);">+0.11</div>
+      <div class="sub">0.71 &rarr; 0.82</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">任务成功率总提升</div>
+      <div class="value" style="color:var(--accent-green);">+13.8pp</div>
+      <div class="sub">82.3% &rarr; 96.1%</div>
+    </div>
+  </div>
+  <div class="opt-box">
+    <h4>三大核心突破</h4>
+    <ol>
+      <li><strong>错误防御体系 (R09)</strong> — 12 类错误模式检测 + 自一致性检查机制，负面样本检测率从 32% 提升至 72%。这是整个系统质量的基石。</li>
+      <li><strong>伏笔追踪网络 (R10)</strong> — 动态"伏笔-回收"关系图谱使悬疑 Genre 伏笔召回率提升 14pp，仙侠 Genre 提升 11pp。叙事连贯性从 0.72 提升至 0.84。</li>
+      <li><strong>角色档案库 (R11)</strong> — 23 个结构化角色卡使角色一致性从 0.65 跃升至 0.82，OOC 率从 22% 降至 7%。这是用户感知最明显的改进维度。</li>
+    </ol>
+  </div>
+  <div class="opt-box">
+    <h4>Trade-off 总结</h4>
+    <ul>
+      <li><strong>响应时间</strong> — 从基线 1350ms 增至 1590ms (+18%)，主要来自自一致性检查和伏笔追踪的开销。在可接受范围内。</li>
+      <li><strong>Token 消耗</strong> — 约增加 12-15%（角色档案 ~1800 tokens + 伏笔表 ~800 tokens + 错误检测指令 ~600 tokens）。</li>
+      <li><strong>Prompt 复杂度</strong> — 从初始的单层指令发展为包含错误检测、伏笔追踪、角色档案的多层结构化 prompt，对模型指令遵循能力要求更高。</li>
+      <li><strong>最低表现 Genre</strong> — 历史 Genre 综合得分 81.2 (B 级)，受限于严格的历史语境约束和较低的角色一致性得分，为后续优化预留空间。</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  <p>Agent 网文续写评估平台 · ROUND 12 — v1.0 最终综合评估 · 2026-06-18</p>
+  <p style="margin-top:0.3rem;">数据集: plot_coherence (520) + character_consistency (290+) + foreshadowing (370) · 总评估样本: 1,180+</p>
+  <p style="margin-top:0.3rem;">Agent 评估平台 · 迭代二 · 十二轮完整优化 · v1.0 正式发布</p>
+</div>
+
+</body>
+</html>

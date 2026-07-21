@@ -1,0 +1,1146 @@
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    - if: "$CI_COMMIT_TAG"
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+
+stages:
+  - precheck
+  - validate
+  - test
+  - verify
+  - build
+  - integration
+  - report
+  - package
+  - deploy
+
+default:
+  interruptible: true
+  retry: 1
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  PIP_INDEX_URL: "https://pypi.tuna.tsinghua.edu.cn/simple"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_ROOT_USER_ACTION: "ignore"
+  PIP_NO_COLOR: "1"
+  SQL_SNAPSHOT_FILE: "deploy/sql/local_seed.sql"
+  CI_MYSQL_HOST: "mysql"
+  CI_MYSQL_PORT: "3306"
+  CI_MYSQL_DB: "agent_eval"
+  CI_MYSQL_USER: "agent"
+  CI_MYSQL_PASSWORD: "agent123"
+  CI_MYSQL_ROOT_PASSWORD: "root123"
+  CI_MONGO_URI: "mongodb://mongo:27017"
+  CI_MONGO_DB: "agent_eval"
+  ENABLE_IMAGE_BUILD: "false"
+  IMAGE_REGISTRY: "$CI_REGISTRY"
+  IMAGE_REGISTRY_USER: "$CI_REGISTRY_USER"
+  IMAGE_REGISTRY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+  IMAGE_REPOSITORY: "$CI_REGISTRY_IMAGE"
+
+.cache-node: &cache_node
+  key:
+    files:
+      - frontend/package-lock.json
+  paths:
+    - frontend/node_modules/
+  policy: pull-push
+
+.cache-pip: &cache_pip
+  key:
+    files:
+      - backend/requirements.txt
+  paths:
+    - .cache/pip
+  policy: pull-push
+
+ci-config-sanity:
+  stage: precheck
+  image: python:3.11-slim
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: "$CI_COMMIT_TAG"
+  script:
+    - pip install pyyaml==6.0.2
+    - |
+      python - <<'PY'
+      import yaml
+      from pathlib import Path
+
+      ci = yaml.safe_load(Path('.gitlab-ci.yml').read_text(encoding='utf-8'))
+      stages = ci.get('stages', [])
+      assert isinstance(stages, list) and len(stages) >= 6, f'invalid stages: {stages}'
+      print('CI stages:', stages)
+      PY
+
+compose-config-sanity:
+  stage: precheck
+  image: python:3.11-slim
+  dependencies: []
+  rules:
+    - changes:
+        - docker-compose.yml
+        - deploy/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - pip install pyyaml==6.0.2
+    - |
+      python - <<'PY'
+      import yaml
+      from pathlib import Path
+
+      compose_file = Path('docker-compose.yml')
+      if not compose_file.exists():
+          raise SystemExit('docker-compose.yml not found')
+
+      data = yaml.safe_load(compose_file.read_text(encoding='utf-8')) or {}
+      services = data.get('services', {})
+      if not isinstance(services, dict) or not services:
+          raise SystemExit('docker-compose services is empty or invalid')
+
+      required = {'backend', 'frontend', 'mysql', 'redis', 'mongo', 'nginx'}
+      missing = required - set(services.keys())
+      if missing:
+          raise SystemExit(f'missing required compose services: {sorted(missing)}')
+
+      print('compose services:', sorted(services.keys()))
+      PY
+
+sql-snapshot-sync-check:
+  stage: precheck
+  image: alpine:3.20
+  dependencies: []
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: "$CI_COMMIT_TAG"
+  before_script:
+    - apk add --no-cache git
+  script:
+    - test -s "$SQL_SNAPSHOT_FILE"
+    - |
+      if [ -n "${CI_COMMIT_BEFORE_SHA:-}" ] && [ "$CI_COMMIT_BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+        CHANGED_FILES="$(git diff --name-only "$CI_COMMIT_BEFORE_SHA" "$CI_COMMIT_SHA")"
+      else
+        CHANGED_FILES="$(git show --pretty='' --name-only "$CI_COMMIT_SHA")"
+      fi
+
+      echo "Changed files:"
+      echo "$CHANGED_FILES"
+
+      if echo "$CHANGED_FILES" | grep -Eq '^backend/app/models/'; then
+        if ! echo "$CHANGED_FILES" | grep -Fxq "$SQL_SNAPSHOT_FILE"; then
+          echo "Detected model changes but SQL snapshot was not updated."
+          echo "Please export local MySQL seed data and commit $SQL_SNAPSHOT_FILE together with model changes."
+          exit 1
+        fi
+      fi
+
+    - sha256sum "$SQL_SNAPSHOT_FILE"
+
+frontend-quality:
+  stage: validate
+  image: node:20-alpine
+  cache: *cache_node
+  dependencies: []
+  rules:
+    - changes:
+        - frontend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd frontend
+    - npm config set registry https://registry.npmmirror.com
+    - if [ -f package-lock.json ]; then npm ci; else npm install; fi
+    - npm run build
+
+backend-quality:
+  stage: validate
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - python -V
+    - pip install -r requirements.txt -r requirements-dev.txt
+    - python -m compileall app tests
+    - pip install ruff==0.6.9
+    - ruff check app tests --output-format=gitlab --quiet || true
+
+backend-test:
+  stage: test
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-quality
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - pip install pytest-cov
+    - pytest -q --maxfail=1 --junitxml=../reports/backend-junit.xml --cov=app
+      --cov-report=xml:../reports/backend-coverage.xml
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - reports/backend-junit.xml
+      - reports/backend-coverage.xml
+    reports:
+      junit: reports/backend-junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: reports/backend-coverage.xml
+  coverage: "/TOTAL\\s+\\d+\\s+\\d+\\s+(\\d+%)/"
+
+backend-api-contract-tests:
+  stage: test
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-quality
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - pytest -q tests/test_health.py tests/test_task_flow.py tests/test_phase1_api_alignment.py tests/test_phase2_engine_and_task_contract.py
+      --junitxml=../reports/backend-api-junit.xml
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - reports/backend-api-junit.xml
+    reports:
+      junit: reports/backend-api-junit.xml
+
+backend-plugin-unit-tests:
+  stage: test
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-quality
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - pytest -q tests/test_dimension_scoring.py
+      --junitxml=../reports/backend-plugin-junit.xml
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - reports/backend-plugin-junit.xml
+    reports:
+      junit: reports/backend-plugin-junit.xml
+
+backend-endpoint-regression-tests:
+  stage: test
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-quality
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - pytest -q tests/test_strategy_metric_endpoints.py
+      tests/test_analysis_service.py tests/test_dataset_upload.py
+      --junitxml=../reports/backend-regression-junit.xml
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - reports/backend-regression-junit.xml
+    reports:
+      junit: reports/backend-regression-junit.xml
+
+backend-websocket-test:
+  stage: test
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-quality
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt wsproto
+    - pytest -q tests/test_task_websocket.py
+      --junitxml=../reports/backend-ws-junit.xml
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - reports/backend-ws-junit.xml
+    reports:
+      junit: reports/backend-ws-junit.xml
+
+backend-migration-check:
+  stage: verify
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  allow_failure: true
+  needs:
+    - backend-quality
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - export DATABASE_URL="sqlite:///./ci_migration.db"
+    - export PYTHONPATH="$CI_PROJECT_DIR/backend"
+    - alembic upgrade head
+
+backend-model-schema-check:
+  stage: verify
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-quality
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - export DATABASE_URL="sqlite:///./ci_schema.db"
+    - export USE_CELERY="false"
+    - export RAGAS_ENABLED="false"
+    - |
+      python - <<'PY'
+      from app.core.config import get_settings
+      get_settings.cache_clear()
+
+      from app.core.database import engine
+      from app.models import Base
+
+      Base.metadata.create_all(bind=engine)
+      table_names = set(Base.metadata.tables.keys())
+      expected = {
+          "evaluation_tasks",
+          "evaluation_results",
+          "metric_definitions",
+          "evaluation_strategies",
+          "dataset_assets",
+          "agents",
+          "agent_versions",
+          "metric_templates",
+      }
+      missing = expected - table_names
+      if missing:
+          raise SystemExit(f"Missing tables in metadata: {sorted(missing)}")
+
+      task_columns = set(Base.metadata.tables["evaluation_tasks"].columns.keys())
+      required_task_cols = {"id", "name", "status", "config", "input_payload", "metrics", "note"}
+      if not required_task_cols.issubset(task_columns):
+          raise SystemExit("evaluation_tasks table missing required columns")
+
+      print("schema check passed")
+      PY
+
+backend-contract-check:
+  stage: verify
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-quality
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - export DATABASE_URL="sqlite:///./ci_contract.db"
+    - export USE_CELERY="false"
+    - export RAGAS_ENABLED="false"
+    - |
+      python - <<'PY'
+      from app.main import app
+
+      schema = app.openapi()
+      required_paths = [
+          "/api/v1/health/",
+          "/api/v1/tasks/",
+          "/api/v1/tasks/compare",
+          "/api/v1/metrics/",
+          "/api/v1/strategies/",
+          "/api/v1/datasets/upload",
+          "/api/v1/agents/",
+          "/api/v1/metrics/templates/",
+          "/api/v1/demo/seed",
+          "/api/v1/mode-realtime/sessions/start",
+          "/api/v1/mode-realtime/sessions/{session_id}/events",
+          "/api/v1/mode-offline/jobs/submit",
+          "/api/v1/mode-batch/jobs/run",
+      ]
+      missing_paths = [p for p in required_paths if p not in schema.get("paths", {})]
+      if missing_paths:
+          raise SystemExit(f"Missing OpenAPI paths: {missing_paths}")
+
+      schemas = schema.get("components", {}).get("schemas", {})
+      required_schemas = [
+          "TaskRead", "ResultRead", "MetricRead",
+          "OfflineEvalJobRead", "DatasetBatchJobRead",
+          "AgentRead", "MetricTemplateRead",
+      ]
+      missing_schemas = [name for name in required_schemas if name not in schemas]
+      if missing_schemas:
+          raise SystemExit(f"Missing OpenAPI schemas: {missing_schemas}")
+
+      print("openapi contract check passed")
+      PY
+
+frontend-dependency-audit:
+  stage: verify
+  image: node:20-alpine
+  cache: *cache_node
+  dependencies: []
+  allow_failure: true
+  rules:
+    - changes:
+        - frontend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd frontend
+    - npm config set registry https://registry.npmmirror.com
+    - if [ -f package-lock.json ]; then npm ci; else npm install; fi
+    - |
+      set +e
+      npm audit --registry=https://registry.npmjs.org --omit=dev --audit-level=high
+      rc=$?
+      set -e
+      if [ $rc -ne 0 ]; then
+        echo "[audit] high/critical vulnerabilities found (non-blocking)."
+      else
+        echo "[audit] no high/critical vulnerabilities detected."
+      fi
+
+frontend-build:
+  stage: build
+  image: node:20-alpine
+  cache: *cache_node
+  dependencies: []
+  needs:
+    - frontend-quality
+  rules:
+    - changes:
+        - frontend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd frontend
+    - npm config set registry https://registry.npmmirror.com
+    - if [ -f package-lock.json ]; then npm ci; else npm install; fi
+    - npm run build
+    - test -f dist/index.html
+    - test -s dist/index.html
+  artifacts:
+    paths:
+      - frontend/dist/
+    expire_in: 1 week
+
+backend-build:
+  stage: build
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-test
+    - backend-api-contract-tests
+    - backend-plugin-unit-tests
+    - backend-endpoint-regression-tests
+    - backend-websocket-test
+    - backend-model-schema-check
+    - backend-contract-check
+    - backend-migration-check
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - export DATABASE_URL="sqlite:///./ci_build.db"
+    - export USE_CELERY="false"
+    - export RAGAS_ENABLED="false"
+    - |
+      python - <<'PY'
+      import json
+      from app.main import app
+
+      with open('openapi.json', 'w', encoding='utf-8') as f:
+          f.write(json.dumps(app.openapi(), ensure_ascii=False, indent=2))
+      PY
+    - test -s openapi.json
+  artifacts:
+    paths:
+      - backend/openapi.json
+    expire_in: 1 week
+
+backend-integration-smoke:
+  stage: integration
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-build
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - export DATABASE_URL="sqlite:///./ci_integration.db"
+    - export USE_CELERY="false"
+    - export RAGAS_ENABLED="false"
+    - |
+      python - <<'PY'
+      from fastapi.testclient import TestClient
+      from app.main import app
+
+      client = TestClient(app)
+      r = client.get('/api/v1/health/')
+      assert r.status_code == 200, r.text
+      assert r.json().get('status') == 'ok'
+      PY
+
+backend-taskflow-smoke:
+  stage: integration
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-build
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - export DATABASE_URL="sqlite:///./ci_flow.db"
+    - export USE_CELERY="false"
+    - export RAGAS_ENABLED="false"
+    - |
+      python - <<'PY'
+      from app.core.database import engine
+      from app.models import Base
+      from fastapi.testclient import TestClient
+      from app.main import app
+
+      Base.metadata.create_all(bind=engine)
+
+      payload = {
+          "name": "ci-taskflow-smoke",
+          "agent_version": "v1",
+          "dataset_id": "ci_ds",
+          "mode": "result",
+          "method": "fuzzy",
+          "dimension": "effectiveness",
+          "config": {
+              "metrics": ["response_time", "task_success", "answer_relevancy"],
+              "strategy": "default",
+          },
+          "input_payload": {
+              "question": "what is rag",
+              "answer": "rag is retrieval augmented generation",
+              "ground_truth": "retrieval-augmented generation",
+              "contexts": ["retrieval + generation"],
+              "response_time_ms": 200,
+              "token_usage": 120,
+              "task_success": True,
+              "tool_calls_total": 2,
+              "tool_calls_success": 2,
+          },
+      }
+
+      client = TestClient(app)
+      create_resp = client.post('/api/v1/tasks/', json=payload)
+      assert create_resp.status_code == 200, create_resp.text
+      tid = create_resp.json()['id']
+
+      run_resp = client.post(f'/api/v1/tasks/{tid}/execute')
+      assert run_resp.status_code == 200, run_resp.text
+
+      result_resp = client.get(f'/api/v1/results/task/{tid}')
+      assert result_resp.status_code == 200, result_resp.text
+      assert isinstance(result_resp.json(), list)
+
+      cmp_resp = client.post('/api/v1/results/compare', json={"task_ids": [tid]})
+      assert cmp_resp.status_code == 200, cmp_resp.text
+      PY
+
+backend-mode-eval-smoke:
+  stage: integration
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-build
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - cd backend
+    - pip install -r requirements.txt
+    - export DATABASE_URL="sqlite:///./ci_mode.db"
+    - export USE_CELERY="false"
+    - export RAGAS_ENABLED="false"
+    - |
+      python - <<'PY'
+      from app.core.database import engine
+      from app.models import Base
+      from fastapi.testclient import TestClient
+      from app.main import app
+
+      Base.metadata.create_all(bind=engine)
+
+      client = TestClient(app)
+
+      rt = client.post('/api/v1/mode-realtime/sessions/start', json={"agent_name": "ci-agent", "task": "ci-task"})
+      assert rt.status_code == 200, rt.text
+      sid = rt.json()['session_id']
+
+      st = client.post(f'/api/v1/mode-realtime/sessions/{sid}/step-start', json={"step": 1, "action": "query_order"})
+      assert st.status_code == 200, st.text
+
+      tc = client.post(f'/api/v1/mode-realtime/sessions/{sid}/tool-call', json={"tool_name": "query_order", "dangerous": False})
+      assert tc.status_code == 200, tc.text
+
+      ev = client.post(
+          f'/api/v1/mode-realtime/sessions/{sid}/events',
+          json={
+            "event_type": "node_execution",
+            "node": "supervisor",
+            "agent_type": "supervisor",
+            "step": 1,
+            "message": "route to worker",
+            "next_agent": "writer-agent",
+            "tool_calls": [{"name": "outline_search", "params": {"chapter": 1}, "dangerous": False}],
+            "state": {"chapter": 1},
+            "duration_sec": 0.6,
+            "source": "langgraph-stream",
+          },
+      )
+      assert ev.status_code == 200, ev.text
+      assert ev.json().get("decision") in {"CONTINUE", "STOP", "BLOCK", "TIMEOUT"}
+
+      se = client.post(f'/api/v1/mode-realtime/sessions/{sid}/step-end', json={"step": 1, "duration_sec": 1.3})
+      assert se.status_code == 200, se.text
+
+      end = client.post(f'/api/v1/mode-realtime/sessions/{sid}/end')
+      assert end.status_code == 200, end.text
+
+      trace_payload = {
+          "trace": {
+              "session_id": "ci_trace_01",
+              "task": "query order",
+              "steps": [
+                  {
+                      "step": 1,
+                      "thought": "query order first",
+                      "action": {"tool": "query_order", "params": {}},
+                      "result": "ok",
+                      "duration": 1.1,
+                  }
+              ],
+              "final_result": "ok",
+              "success": True,
+          }
+      }
+
+      off = client.post('/api/v1/mode-offline/jobs/submit', json=trace_payload)
+      assert off.status_code == 200, off.text
+
+      dataset_payload = '{"samples":[{"session_id":"d1","task":"batch","result":"ok","success":true}]}'
+      up = client.post('/api/v1/datasets/upload', files={"file": ("mode_batch.json", dataset_payload, "application/json")})
+      assert up.status_code == 200, up.text
+      dataset_id = up.json()['dataset']['dataset_id']
+
+      batch = client.post('/api/v1/mode-batch/jobs/run', json={"dataset_id": dataset_id})
+      assert batch.status_code == 200, batch.text
+      PY
+
+backend-mysql-seeded-e2e:
+  stage: integration
+  image: python:3.11-slim
+  cache: *cache_pip
+  dependencies: []
+  needs:
+    - backend-build
+    - sql-snapshot-sync-check
+  services:
+    - name: mysql:8.0
+      alias: mysql
+    - name: mongo:7
+      alias: mongo
+  variables:
+    DEBIAN_FRONTEND: "noninteractive"
+    MYSQL_DATABASE: "$CI_MYSQL_DB"
+    MYSQL_ROOT_PASSWORD: "$CI_MYSQL_ROOT_PASSWORD"
+    MYSQL_ROOT_HOST: "%"
+    MYSQL_USER: "$CI_MYSQL_USER"
+    MYSQL_PASSWORD: "$CI_MYSQL_PASSWORD"
+  rules:
+    - changes:
+        - backend/**/*
+        - deploy/sql/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - apt-get update && apt-get install -y --no-install-recommends
+      default-mysql-client && rm -rf /var/lib/apt/lists/*
+    - cd backend
+    - pip install -r requirements.txt
+    - export MYSQL_HOST="$CI_MYSQL_HOST"
+    - export MYSQL_PORT="$CI_MYSQL_PORT"
+    - export MYSQL_DB="$CI_MYSQL_DB"
+    - export MYSQL_USER="$CI_MYSQL_USER"
+    - export MYSQL_PASSWORD="$CI_MYSQL_PASSWORD"
+    - export MONGO_URI="$CI_MONGO_URI"
+    - export MONGO_DB="$CI_MONGO_DB"
+    - export USE_CELERY="false"
+    - export RAGAS_ENABLED="false"
+    - export
+      DATABASE_URL="mysql+pymysql://${CI_MYSQL_USER}:${CI_MYSQL_PASSWORD}@${CI_MYSQL_HOST}:${CI_MYSQL_PORT}/${CI_MYSQL_DB}?charset=utf8mb4"
+    - |
+      python - <<'PY'
+      import os
+      import socket
+      import sys
+      import time
+
+      host = os.environ["CI_MYSQL_HOST"]
+      port = int(os.environ["CI_MYSQL_PORT"])
+
+      print(f"Resolving {host}:{port} ...")
+      try:
+          infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+      except Exception as exc:  # pragma: no cover
+          raise SystemExit(f"MySQL host resolve failed: {exc}")
+
+      addrs = sorted({info[4][0] for info in infos})
+      print("Resolved addresses:", ", ".join(addrs))
+
+      for i in range(1, 121):
+          try:
+              with socket.create_connection((host, port), timeout=2):
+                  print(f"MySQL TCP is reachable after {i} attempts")
+                  break
+          except OSError as exc:
+              if i in {1, 10, 20, 30, 60, 90, 120}:
+                  print(f"Attempt {i}: waiting for MySQL TCP ({exc})")
+              time.sleep(2)
+      else:
+          raise SystemExit("MySQL TCP port did not become reachable in time")
+      PY
+    - |
+      last_error=""
+      for i in $(seq 1 60); do
+        if mysql -h"$CI_MYSQL_HOST" -P"$CI_MYSQL_PORT" -u"$CI_MYSQL_USER" -p"$CI_MYSQL_PASSWORD" --protocol=tcp --skip-ssl "$CI_MYSQL_DB" -e "SELECT 1" >/dev/null 2>&1; then
+          echo "MySQL auth/database is ready after ${i} attempts"
+          break
+        fi
+
+        last_error="$(mysql -h"$CI_MYSQL_HOST" -P"$CI_MYSQL_PORT" -u"$CI_MYSQL_USER" -p"$CI_MYSQL_PASSWORD" --protocol=tcp --skip-ssl "$CI_MYSQL_DB" -e "SELECT 1" 2>&1 >/dev/null || true)"
+        if [ "$i" = "1" ] || [ "$i" = "10" ] || [ "$i" = "20" ] || [ "$i" = "30" ] || [ "$i" = "45" ]; then
+          echo "[diag] app auth attempt ${i} failed: ${last_error}"
+        fi
+
+        if [ "$i" -eq 60 ]; then
+          echo "MySQL port is reachable but app user/database is not ready. Trying root bootstrap once..."
+          mysql -h"$CI_MYSQL_HOST" -P"$CI_MYSQL_PORT" -uroot -p"$CI_MYSQL_ROOT_PASSWORD" --protocol=tcp --skip-ssl -e "CREATE DATABASE IF NOT EXISTS ${CI_MYSQL_DB} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS '${CI_MYSQL_USER}'@'%' IDENTIFIED BY '${CI_MYSQL_PASSWORD}'; GRANT ALL PRIVILEGES ON ${CI_MYSQL_DB}.* TO '${CI_MYSQL_USER}'@'%'; FLUSH PRIVILEGES;" || true
+          if ! mysql -h"$CI_MYSQL_HOST" -P"$CI_MYSQL_PORT" -u"$CI_MYSQL_USER" -p"$CI_MYSQL_PASSWORD" --protocol=tcp --skip-ssl "$CI_MYSQL_DB" -e "SELECT 1" >/dev/null 2>&1; then
+            echo "MySQL bootstrap failed. app user/database still unavailable."
+            echo "[diag] host=${CI_MYSQL_HOST} port=${CI_MYSQL_PORT} db=${CI_MYSQL_DB} user=${CI_MYSQL_USER}"
+            echo "[diag] last app auth error: ${last_error}"
+            exit 1
+          fi
+          echo "MySQL auth/database became ready after root bootstrap"
+          break
+        fi
+
+        sleep 2
+      done
+    - |
+      python - <<'PY'
+      import os
+      os.environ["PYTHONWARNINGS"] = "ignore"
+
+      from app.core.config import get_settings
+      get_settings.cache_clear()
+
+      from app.core.database import engine
+      from app.models import Base
+
+      Base.metadata.create_all(bind=engine)
+      print("metadata create_all done")
+      PY
+    - test -s "$CI_PROJECT_DIR/$SQL_SNAPSHOT_FILE"
+    - mysql -h"$CI_MYSQL_HOST" -P"$CI_MYSQL_PORT" -u"$CI_MYSQL_USER"
+      -p"$CI_MYSQL_PASSWORD" --protocol=tcp --skip-ssl "$CI_MYSQL_DB" <
+      "$CI_PROJECT_DIR/$SQL_SNAPSHOT_FILE"
+    - |
+      python - <<'PY'
+      from fastapi.testclient import TestClient
+
+      from app.core.config import get_settings
+      get_settings.cache_clear()
+
+      from app.main import app
+
+      client = TestClient(app)
+
+      health = client.get('/api/v1/health/')
+      assert health.status_code == 200, health.text
+      health_json = health.json()
+      assert health_json['database']['mysql'] == 'up', health_json
+
+      metrics = client.get('/api/v1/metrics/')
+      assert metrics.status_code == 200, metrics.text
+      assert len(metrics.json()) >= 1, "seeded metrics should not be empty"
+
+      strategies = client.get('/api/v1/strategies/')
+      assert strategies.status_code == 200, strategies.text
+      assert len(strategies.json()) >= 1, "seeded strategies should not be empty"
+
+      payload = {
+          "name": "mysql-seeded-ci-task",
+          "agent_version": "v1",
+          "dataset_id": "ci_ds_mysql",
+          "mode": "result",
+          "method": "fuzzy",
+          "dimension": "effectiveness",
+          "config": {
+              "metrics": ["response_time", "token_usage", "task_success"],
+              "strategy": "default",
+              "enable_process_trace": True,
+          },
+          "input_payload": {
+              "question": "what is rag",
+              "answer": "retrieval augmented generation",
+              "ground_truth": "retrieval-augmented generation",
+              "contexts": ["rag combines retrieval and generation"],
+              "response_time_ms": 220,
+              "token_usage": 140,
+              "task_success": True,
+              "tool_calls_total": 2,
+              "tool_calls_success": 2,
+          },
+      }
+
+      create_resp = client.post('/api/v1/tasks/', json=payload)
+      assert create_resp.status_code == 200, create_resp.text
+      task_id = create_resp.json()['id']
+
+      exec_resp = client.post(f'/api/v1/tasks/{task_id}/execute')
+      assert exec_resp.status_code == 200, exec_resp.text
+
+      result_resp = client.get(f'/api/v1/results/task/{task_id}')
+      assert result_resp.status_code == 200, result_resp.text
+      assert isinstance(result_resp.json(), list)
+      PY
+
+frontend-artifact-check:
+  stage: integration
+  image: node:20-alpine
+  needs:
+    - job: frontend-build
+      artifacts: true
+  rules:
+    - changes:
+        - frontend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - test -f frontend/dist/index.html
+    - test -s frontend/dist/index.html
+
+backend-report:
+  stage: report
+  image: python:3.11-slim
+  needs:
+    - job: backend-build
+      artifacts: true
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - |
+      python - <<'PY'
+      import json
+      from pathlib import Path
+
+      schema = json.loads(Path('backend/openapi.json').read_text(encoding='utf-8'))
+      paths = schema.get('paths', {})
+      print(f'OpenAPI paths: {len(paths)}')
+      print('Sample paths:', ', '.join(sorted(paths.keys())[:10]))
+      PY
+
+backend-ci-summary:
+  stage: report
+  image: python:3.11-slim
+  dependencies: []
+  needs:
+    - backend-test
+    - backend-api-contract-tests
+    - backend-plugin-unit-tests
+    - backend-endpoint-regression-tests
+    - backend-websocket-test
+    - backend-model-schema-check
+    - backend-contract-check
+    - backend-integration-smoke
+    - backend-taskflow-smoke
+    - backend-mode-eval-smoke
+    - backend-mysql-seeded-e2e
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - echo "Backend CI checks passed:"
+    - echo "- backend-test (coverage)"
+    - echo "- backend-api-contract-tests"
+    - echo "- backend-plugin-unit-tests"
+    - echo "- backend-endpoint-regression-tests"
+    - echo "- backend-websocket-test"
+    - echo "- backend-model-schema-check"
+    - echo "- backend-contract-check"
+    - echo "- backend-integration-smoke"
+    - echo "- backend-taskflow-smoke"
+    - echo "- backend-mode-eval-smoke"
+    - echo "- backend-mysql-seeded-e2e"
+
+frontend-report:
+  stage: report
+  image: alpine:3.20
+  needs:
+    - job: frontend-build
+      artifacts: true
+  rules:
+    - changes:
+        - frontend/**/*
+        - .gitlab-ci.yml
+    - when: never
+  script:
+    - echo "frontend dist files:"
+    - find frontend/dist -maxdepth 2 -type f | head -n 20
+
+security-audit:
+  stage: test
+  image: python:3.11-slim
+  cache: *cache_pip
+  allow_failure: true
+  dependencies: []
+  rules:
+    - if: "$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH"
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - pip install pip-audit==2.7.3
+    - pip-audit -r backend/requirements.txt || true
+
+backend-image-build:
+  stage: package
+  image: docker:24.0.5
+  dependencies: []
+  needs:
+    - backend-build
+  services:
+    - name: docker:24.0.5-dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  rules:
+    - if:
+        '$ENABLE_IMAGE_BUILD == "true" && $IMAGE_REGISTRY && $IMAGE_REGISTRY_USER
+        && $IMAGE_REGISTRY_PASSWORD && $IMAGE_REPOSITORY && $CI_COMMIT_BRANCH ==
+        $CI_DEFAULT_BRANCH'
+    - if:
+        '$ENABLE_IMAGE_BUILD == "true" && $IMAGE_REGISTRY && $IMAGE_REGISTRY_USER
+        && $IMAGE_REGISTRY_PASSWORD && $IMAGE_REPOSITORY && $CI_COMMIT_TAG'
+    - when: never
+  script:
+    - echo "$IMAGE_REGISTRY_PASSWORD" | docker login -u "$IMAGE_REGISTRY_USER"
+      --password-stdin "$IMAGE_REGISTRY"
+    - docker build -t "$IMAGE_REPOSITORY/backend:$CI_COMMIT_SHORT_SHA" backend
+    - docker push "$IMAGE_REPOSITORY/backend:$CI_COMMIT_SHORT_SHA"
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+        docker tag "$IMAGE_REPOSITORY/backend:$CI_COMMIT_SHORT_SHA" "$IMAGE_REPOSITORY/backend:latest"
+        docker push "$IMAGE_REPOSITORY/backend:latest"
+      fi
+
+frontend-image-build:
+  stage: package
+  image: docker:24.0.5
+  dependencies: []
+  needs:
+    - frontend-build
+  services:
+    - name: docker:24.0.5-dind
+      command: ["--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  rules:
+    - if:
+        '$ENABLE_IMAGE_BUILD == "true" && $IMAGE_REGISTRY && $IMAGE_REGISTRY_USER
+        && $IMAGE_REGISTRY_PASSWORD && $IMAGE_REPOSITORY && $CI_COMMIT_BRANCH ==
+        $CI_DEFAULT_BRANCH'
+    - if:
+        '$ENABLE_IMAGE_BUILD == "true" && $IMAGE_REGISTRY && $IMAGE_REGISTRY_USER
+        && $IMAGE_REGISTRY_PASSWORD && $IMAGE_REPOSITORY && $CI_COMMIT_TAG'
+    - when: never
+  script:
+    - echo "$IMAGE_REGISTRY_PASSWORD" | docker login -u "$IMAGE_REGISTRY_USER"
+      --password-stdin "$IMAGE_REGISTRY"
+    - docker build -t "$IMAGE_REPOSITORY/frontend:$CI_COMMIT_SHORT_SHA" frontend
+    - docker push "$IMAGE_REPOSITORY/frontend:$CI_COMMIT_SHORT_SHA"
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH" ]; then
+        docker tag "$IMAGE_REPOSITORY/frontend:$CI_COMMIT_SHORT_SHA" "$IMAGE_REPOSITORY/frontend:latest"
+        docker push "$IMAGE_REPOSITORY/frontend:latest"
+      fi
+
+deploy-staging:
+  stage: deploy
+  image: alpine:3.20
+  environment:
+    name: staging
+  rules:
+    - if:
+        '$ENABLE_IMAGE_BUILD == "true" && $IMAGE_REPOSITORY && $CI_COMMIT_BRANCH
+        == $CI_DEFAULT_BRANCH'
+      when: manual
+  before_script:
+    - apk add --no-cache openssh-client
+    - test -n "$STAGING_DEPLOY_SSH_PRIVATE_KEY"
+    - mkdir -p ~/.ssh
+    - echo "$STAGING_DEPLOY_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    - chmod +x deploy/scripts/remote_deploy.sh
+  script:
+    - export DEPLOY_HOST="$STAGING_DEPLOY_HOST"
+    - export DEPLOY_USER="$STAGING_DEPLOY_USER"
+    - export DEPLOY_PORT="${STAGING_DEPLOY_PORT:-22}"
+    - export DEPLOY_PATH="$STAGING_DEPLOY_PATH"
+    - export
+      DEPLOY_COMPOSE_FILE="${STAGING_DEPLOY_COMPOSE_FILE:-docker-compose.yml}"
+    - export BACKEND_IMAGE="$IMAGE_REPOSITORY/backend:$CI_COMMIT_SHORT_SHA"
+    - export FRONTEND_IMAGE="$IMAGE_REPOSITORY/frontend:$CI_COMMIT_SHORT_SHA"
+    - sh deploy/scripts/remote_deploy.sh
+
+smoke-staging:
+  stage: deploy
+  image: curlimages/curl:8.11.1
+  needs:
+    - deploy-staging
+  rules:
+    - if: '$ENABLE_IMAGE_BUILD == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+  script:
+    - test -n "$STAGING_HEALTHCHECK_URL"
+    - curl -fsS "$STAGING_HEALTHCHECK_URL"
+
+deploy-production:
+  stage: deploy
+  image: alpine:3.20
+  environment:
+    name: production
+  rules:
+    - if: '$ENABLE_IMAGE_BUILD == "true" && $IMAGE_REPOSITORY && $CI_COMMIT_TAG'
+      when: manual
+  before_script:
+    - apk add --no-cache openssh-client
+    - test -n "$PROD_DEPLOY_SSH_PRIVATE_KEY"
+    - mkdir -p ~/.ssh
+    - echo "$PROD_DEPLOY_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    - chmod +x deploy/scripts/remote_deploy.sh
+  script:
+    - export DEPLOY_HOST="$PROD_DEPLOY_HOST"
+    - export DEPLOY_USER="$PROD_DEPLOY_USER"
+    - export DEPLOY_PORT="${PROD_DEPLOY_PORT:-22}"
+    - export DEPLOY_PATH="$PROD_DEPLOY_PATH"
+    - export
+      DEPLOY_COMPOSE_FILE="${PROD_DEPLOY_COMPOSE_FILE:-docker-compose.yml}"
+    - export BACKEND_IMAGE="$IMAGE_REPOSITORY/backend:$CI_COMMIT_SHORT_SHA"
+    - export FRONTEND_IMAGE="$IMAGE_REPOSITORY/frontend:$CI_COMMIT_SHORT_SHA"
+    - sh deploy/scripts/remote_deploy.sh
+
+deploy-local:
+  stage: deploy
+  tags:
+    - deploy-shell
+  dependencies: []
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+  script:
+    - cd /opt/deploy/task2
+    - git checkout -- .
+    - git pull "$CI_REPOSITORY_URL" master
+    - docker compose up -d --build
+    - docker system prune -f --filter "until=24h" || true

@@ -1,0 +1,40 @@
+{
+  "dataset": "foreshadowing",
+  "version": "1.0",
+  "description": "伏笔回收检测数据集：伏笔句+回收句对，验证有效回收",
+  "target_dimensions": ["foreshadowing_resolution", "plot_continuity", "context_recall", "hallucination"],
+  "total_pairs_target": 500,
+  "genres": ["xianxia", "urban", "western_fantasy", "xuanhuan", "historical", "sci_fi", "mystery", "light_novel"],
+  "pair_types": ["valid_release", "unresolved", "false_release", "orphan_foreshadowing"],
+  "foreshadowing_types": ["object_plot_device", "character_secret", "lore_mystery", "prophecy"],
+  "resolution_types": ["power_up", "reveal", "callback", "none"],
+  "error_types": ["unresolved_foreshadowing", "false_release", "orphan_foreshadowing", "overly_telegraphed", "retcon_contradiction", "mistimed_release", "underutilized_payoff", "fake_tension", "contradictory_payoff", "repetitive_foreshadowing"],
+  "sample_schema": {
+    "sample_id": "string — foreshadow_{genre}_{id}",
+    "genre": "string",
+    "pair_type": "string",
+    "foreshadowing": {
+      "chapter_number": "int",
+      "text": "string",
+      "context": "string",
+      "foreshadowing_type": "string",
+      "subtlety_level": "string"
+    },
+    "resolution": {
+      "chapter_number": "int or null",
+      "text": "string",
+      "context": "string",
+      "resolution_type": "string",
+      "satisfaction": "int 1-5"
+    },
+    "evaluation": {
+      "foreshadowing_resolution": "0 or 1",
+      "plot_continuity": "int 1-5",
+      "context_recall": "float 0-1",
+      "hallucination": "float 0-1",
+      "is_valid_pair": "bool",
+      "gap_chapters": "int or null",
+      "error_type": "string"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "plot_coherence_eval",
+  "version": "1.0",
+  "description": "情节连贯性评估策略：综合叙事连贯性、情节连续性、世界观一致性等维度",
+  "mode": "batch_dataset",
+  "method": "explicit_with_judge",
+  "dimension": "effectiveness",
+  "weights": {
+    "narrative_coherence": 0.25,
+    "plot_continuity": 0.20,
+    "world_consistency": 0.15,
+    "genre_fidelity": 0.10,
+    "faithfulness": 0.15,
+    "hallucination": 0.15
+  },
+  "dimension_weights": {
+    "effectiveness": 1.0
+  },
+  "metrics": [
+    "narrative_coherence",
+    "plot_continuity",
+    "world_consistency",
+    "genre_fidelity",
+    "faithfulness",
+    "hallucination"
+  ],
+  "judge_config": {
+    "rubric_summary": "你是一位专业的小说情节评估专家。请根据以下维度对AI生成的续写内容进行评分：叙事连贯性、情节连续性、世界观一致性、类型忠实度、忠实性、幻觉检测。每项1-5分。输出JSON格式。"
+  }
+}

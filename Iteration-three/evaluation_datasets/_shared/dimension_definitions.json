@@ -1,0 +1,142 @@
+{
+  "version": "1.0",
+  "description": "评估维度定义体系",
+  "categories": [
+    {
+      "category": "domain_specific",
+      "name": "领域特有维度",
+      "dimensions": [
+        {
+          "id": "narrative_coherence",
+          "name": "叙事连贯性",
+          "description": "前后情节逻辑是否通顺、因果链是否完整",
+          "scale": "1-5",
+          "normalization": "value/5",
+          "weight_default": 0.25
+        },
+        {
+          "id": "character_fidelity",
+          "name": "角色 fidelity",
+          "description": "角色的言行是否符合设定人设",
+          "scale": "1-5",
+          "normalization": "value/5",
+          "weight_default": 0.35
+        },
+        {
+          "id": "plot_continuity",
+          "name": "情节连续性",
+          "description": "事件顺序、时间线是否自洽",
+          "scale": "1-5",
+          "normalization": "value/5",
+          "weight_default": 0.20
+        },
+        {
+          "id": "foreshadowing_resolution",
+          "name": "伏笔回收",
+          "description": "伏笔是否得到有效回收",
+          "scale": "0-1",
+          "normalization": "identity",
+          "weight_default": 0.35
+        },
+        {
+          "id": "world_consistency",
+          "name": "世界观一致性",
+          "description": "设定是否前后统一（修为体系、魔法规则不矛盾）",
+          "scale": "1-5",
+          "normalization": "value/5",
+          "weight_default": 0.15
+        },
+        {
+          "id": "genre_fidelity",
+          "name": "类型忠实度",
+          "description": "内容是否符合所属类型的核心特征",
+          "scale": "1-5",
+          "normalization": "value/5",
+          "weight_default": 0.10
+        }
+      ]
+    },
+    {
+      "category": "ragas_style",
+      "name": "RAGAS 风格维度",
+      "dimensions": [
+        {
+          "id": "faithfulness",
+          "name": "忠实性",
+          "description": "Agent 输出是否忠实于给定的上下文/设定，不虚构未提及的信息",
+          "scale": "0-1",
+          "normalization": "identity",
+          "weight_default": 0.15
+        },
+        {
+          "id": "answer_relevancy",
+          "name": "响应相关性",
+          "description": "Agent 的回答是否与用户的问题直接相关，不跑题",
+          "scale": "0-1",
+          "normalization": "identity",
+          "weight_default": 0.10
+        },
+        {
+          "id": "context_recall",
+          "name": "知识召回率",
+          "description": "Agent 在生成时是否成功用到了知识库中的相关设定信息",
+          "scale": "0-1",
+          "normalization": "identity",
+          "weight_default": 0.10
+        }
+      ]
+    },
+    {
+      "category": "agent_eval",
+      "name": "Agent 评估维度",
+      "dimensions": [
+        {
+          "id": "instruction_following",
+          "name": "指令遵循度",
+          "description": "Agent 是否准确遵循了用户指令中的具体要求（字数、风格、格式等）",
+          "scale": "1-5",
+          "normalization": "value/5",
+          "weight_default": 0.10
+        },
+        {
+          "id": "hallucination",
+          "name": "幻觉检测",
+          "description": "是否生成了与已有设定冲突的内容（角色属性前后不一致、事件矛盾等）",
+          "scale": "0-1",
+          "normalization": "identity",
+          "weight_default": 0.20
+        },
+        {
+          "id": "tool_efficiency",
+          "name": "工具使用效率",
+          "description": "工具调用次数是否合理、是否在必要场景下正确调用对应工具",
+          "scale": "raw",
+          "normalization": "custom",
+          "weight_default": 0.05
+        },
+        {
+          "id": "reasoning_quality",
+          "name": "推理质量",
+          "description": "Agent 的规划与推理链是否清晰、合理",
+          "scale": "1-5",
+          "normalization": "value/5",
+          "weight_default": 0.10
+        }
+      ]
+    }
+  ],
+  "dimension_dataset_mapping": {
+    "plot_coherence": {
+      "primary": ["narrative_coherence", "plot_continuity"],
+      "secondary": ["world_consistency", "genre_fidelity", "faithfulness", "hallucination", "context_recall"]
+    },
+    "character_consistency": {
+      "primary": ["character_fidelity"],
+      "secondary": ["world_consistency", "genre_fidelity", "faithfulness", "hallucination", "context_recall"]
+    },
+    "foreshadowing": {
+      "primary": ["foreshadowing_resolution", "plot_continuity"],
+      "secondary": ["context_recall", "hallucination"]
+    }
+  }
+}

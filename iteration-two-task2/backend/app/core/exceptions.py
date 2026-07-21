@@ -1,0 +1,13 @@
+class AppException(Exception):
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        status_code: int = 400,
+        detail: dict | None = None,
+    ):
+        self.code = code
+        self.message = message
+        self.status_code = status_code
+        self.detail = detail or {}
+        super().__init__(message)

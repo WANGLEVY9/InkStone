@@ -1,0 +1,132 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_COMMIT_TAG'
+
+stages:
+  - validate
+  - test
+  - build
+
+variables:
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.cache/uv"
+
+.cache-node: &cache_node
+  key:
+    files:
+      - frontend/package-lock.json
+  paths:
+    - frontend/node_modules/
+  policy: pull-push
+
+.cache-uv: &cache_uv
+  key:
+    files:
+      - backend/pyproject.toml
+      # 谁如果本地跑过uv sync且提交了uv.lock，再把下面这行注释取消
+      # - backend/uv.lock 
+  paths:
+    - .cache/uv
+  policy: pull-push
+
+# 前端
+frontend-lint:
+  stage: validate
+  image: node:22-alpine
+  cache: *cache_node
+  allow_failure: true
+  rules:
+    - changes:
+        - frontend/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd frontend
+    - npm config set registry https://registry.npmmirror.com/
+    - npm install
+    - npm run lint --if-present
+
+frontend-build:
+  stage: build
+  image: node:22-alpine
+  cache: *cache_node
+  needs:
+    - frontend-lint
+  rules:
+    - changes:
+        - frontend/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/
+    expire_in: 1 week
+
+# 后端
+backend-lint:
+  stage: validate
+  image: python:3.13-slim
+  cache: *cache_uv
+  allow_failure: true
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd backend
+    - pip install uv -i http://mirrors.nju.edu.cn/pypi/web/simple --trusted-host mirrors.nju.edu.cn || pip install uv
+    - export UV_INDEX_URL=http://mirrors.nju.edu.cn/pypi/web/simple
+    - uv sync
+    - uv run ruff check app tests
+    - uv run ruff format --check app tests
+    - uv run mypy app
+
+backend-test:
+  stage: test
+  image: python:3.13-slim
+  cache: *cache_uv
+  needs:
+    - backend-lint
+  allow_failure: true
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd backend
+    - pip install uv -i http://mirrors.nju.edu.cn/pypi/web/simple --trusted-host mirrors.nju.edu.cn || pip install uv
+    - export UV_INDEX_URL=http://mirrors.nju.edu.cn/pypi/web/simple
+    - uv sync
+    - uv run pytest -q --maxfail=1
+
+backend-build:
+  stage: build
+  image: python:3.13-slim
+  cache: *cache_uv
+  needs:
+    - backend-test
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab-ci.yml
+  script:
+    - cd backend
+    - echo "API 路由尚未完善，暂不生成 openapi.json"
+
+# deploy-local:
+#   stage: deploy
+#   tags:
+#     - deploy-shell-task1
+#   dependencies: []
+#   rules:
+#     - if: '$CI_COMMIT_REF_NAME == "master"'
+#   script:
+#     - cd /opt/deploy/task1
+#     - git reset --hard
+#     - git pull $CI_REPOSITORY_URL $CI_COMMIT_REF_NAME
+#     - docker compose up -d --build

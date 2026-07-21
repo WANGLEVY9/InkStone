@@ -1,0 +1,5 @@
+{"step":1,"question":"查询北京天气","answer":"北京晴，25C","response_time_ms":380,"token_usage":126,"success":true,"error":""}
+{"step":2,"question":"设置明早8点提醒","answer":"已创建提醒","response_time_ms":420,"token_usage":142,"success":true,"error":""}
+{"step":3,"question":"查询明天日程","answer":"上午评审，下午开发","response_time_ms":510,"token_usage":168,"success":true,"error":""}
+{"step":4,"question":"发送会议邮件","answer":"邮件发送失败，请稍后重试","response_time_ms":1720,"token_usage":205,"success":false,"error":"smtp_timeout"}
+{"step":5,"question":"重试发送会议邮件","answer":"邮件已成功发送","response_time_ms":690,"token_usage":182,"success":true,"error":""}

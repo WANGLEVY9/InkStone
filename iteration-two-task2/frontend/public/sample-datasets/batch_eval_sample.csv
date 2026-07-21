@@ -1,0 +1,9 @@
+question,answer,ground_truth,response_time_ms,token_usage,success,tool_calls_total,tool_calls_success
+"什么是向量数据库？","向量数据库用于存储和检索向量表示。","向量数据库是面向高维向量检索的数据库。",620,248,true,1,1
+"请将这段文本翻译成英文","Here is the English translation.","Provide an accurate English translation.",540,210,true,0,0
+"根据订单号查询物流状态","订单已签收。","物流状态应返回已签收。",780,286,true,1,1
+"帮我生成一段 Python 排序代码","def sort_numbers(nums): return sorted(nums)","应生成可运行的排序函数。",860,332,true,0,0
+"从对话中提取用户意图","用户意图是退款申请。","意图识别结果应为退款。",710,274,true,0,0
+"请给出数据库优化建议","建议建立索引、优化查询和分库分表。","应覆盖索引、SQL 优化与容量规划。",940,366,true,0,0
+"安排下周一会议并发送邀请","会议已创建，但邮件发送失败。","应创建会议并成功发送邀请。",1580,402,false,2,1
+"解释一次函数和二次函数区别","一次函数是直线，二次函数是抛物线。","应准确说明形式与图像差异。",690,258,true,0,0

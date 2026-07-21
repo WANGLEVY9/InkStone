@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 01</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .opt-box code { background: #f1f5f9; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.82rem; }
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .comparison-row > div { padding: 1rem; border-radius: var(--radius-sm); }
+  .col-before { background: #fff1f0; border: 1px solid #ffccc7; }
+  .col-after { background: #f6ffed; border: 1px solid #b7eb8f; }
+  .col-before h5, .col-after h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.4rem; }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  li { margin-bottom: 0.25rem; }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+  @media (max-width: 768px) { .section { padding: 1.5rem; } .comparison-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ═══ Cover ═══ -->
+<div class="cover">
+  <div class="badge">初始基线评估</div>
+  <h1>Agent 小说创作 v0.1 · 基线评估报告</h1>
+  <p class="sub">初始基线评估 · Agent 小说创作 v0.1</p>
+  <dl class="meta">
+    <div><dt>评估轮次</dt><dd>ROUND 01</dd></div>
+    <div><dt>版本</dt><dd>v0.1</dd></div>
+    <div><dt>日期</dt><dd>2026-05-10</dd></div>
+    <div><dt>样本量</dt><dd>240 条</dd></div>
+    <div><dt>LLM</dt><dd>DeepSeek-Chat</dd></div>
+  </dl>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 一、执行摘要 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">1</span><h2>执行摘要</h2></div>
+  <p>本次为 Agent 小说创作能力的首次全方位基线评估，基于 <strong>情节连贯性数据集 (Plot Coherence)</strong>，覆盖 <strong>8 种网文类型</strong> 共 240 个样本。评估采用双轨策略：显式量化指标与 LLM-as-a-Judge 深度语义评估相结合。</p>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">任务成功率</div>
+      <div class="value" style="color:var(--accent-yellow)">76.7%</div>
+      <div class="sub">184 / 240 样本成功</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">忠实度</div>
+      <div class="value" style="color:var(--accent-orange)">0.58</div>
+      <div class="sub">/ 1.0</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">答案相关性</div>
+      <div class="value" style="color:var(--accent-yellow)">0.62</div>
+      <div class="sub">/ 1.0</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">上下文召回</div>
+      <div class="value" style="color:var(--accent-orange)">0.55</div>
+      <div class="sub">/ 1.0</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">平均响应时间</div>
+      <div class="value" style="color:var(--accent-red)">2,104</div>
+      <div class="sub">ms</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">安全性评分</div>
+      <div class="value" style="color:var(--accent-yellow)">3.8</div>
+      <div class="sub">/ 5.0</div>
+    </div>
+  </div>
+
+  <div class="opt-box">
+    <h4>评估结论</h4>
+    <p style="font-size:0.85rem;color:var(--text-secondary);">Agent 在基础情节续写任务上初步具备可用性，但整体质量存在较大提升空间。<strong>忠实度 (0.58)</strong> 和 <strong>上下文召回 (0.55)</strong> 为最薄弱环节。历史类及科幻类设定一致性严重不足，幻觉评分偏高 (3.2/5)，Agent 尚未形成有效的类型区分意识。长上下文窗口下质量退化明显，需要在 Prompt 工程与上下文管理方面进行系统优化。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 二、数据集与任务配置 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">2</span><h2>数据集与任务配置</h2></div>
+
+  <h3 style="font-size:0.9rem;font-weight:600;margin-bottom:0.4rem;">2.1 数据集构成</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>类型</th><th>标签</th><th>正面样本</th><th>负面样本</th><th>总计</th></tr></thead>
+      <tbody>
+        <tr><td>仙侠 / 修真</td><td>xianxia</td><td>22</td><td>8</td><td>30</td></tr>
+        <tr><td>都市 / 现代</td><td>urban</td><td>20</td><td>10</td><td>30</td></tr>
+        <tr><td>西方奇幻</td><td>fantasy</td><td>18</td><td>12</td><td>30</td></tr>
+        <tr><td>玄幻</td><td>xuanhuan</td><td>20</td><td>10</td><td>30</td></tr>
+        <tr><td>历史 / 架空历史</td><td>historical</td><td>18</td><td>12</td><td>30</td></tr>
+        <tr><td>科幻</td><td>sci_fi</td><td>16</td><td>14</td><td>30</td></tr>
+        <tr><td>悬疑 / 推理</td><td>mystery</td><td>15</td><td>15</td><td>30</td></tr>
+        <tr><td>轻小说 / 游戏</td><td>light_novel</td><td>20</td><td>10</td><td>30</td></tr>
+        <tr style="font-weight:700;background:#f8fafc;"><td>合计</td><td>8 类型</td><td>149</td><td>91</td><td>240</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.4rem;">2.2 错误类型覆盖</h3>
+  <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.5rem;">负面样本共覆盖 <strong>12 种</strong> 情节连贯性错误类型，分布较为均衡：</p>
+  <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;">
+    <span class="tag-grade tag-D">时间线矛盾</span>
+    <span class="tag-grade tag-D">设定冲突</span>
+    <span class="tag-grade tag-D">角色OOC</span>
+    <span class="tag-grade tag-D">情节跳跃</span>
+    <span class="tag-grade tag-C">机械降神</span>
+    <span class="tag-grade tag-D">剧情漏洞</span>
+    <span class="tag-grade tag-C">情绪不一致</span>
+    <span class="tag-grade tag-C">节奏失控</span>
+    <span class="tag-grade tag-C">信息不对称</span>
+    <span class="tag-grade tag-D">伏笔遗失</span>
+    <span class="tag-grade tag-C">动机缺失</span>
+    <span class="tag-grade tag-C">旁白冲突</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 三、分类型评估结果 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">3</span><h2>分类型评估结果</h2></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>类型</th><th>task_success</th><th>faithfulness</th><th>answer_relevancy</th><th>context_recall</th><th>综合评级</th></tr></thead>
+      <tbody>
+        <tr><td>仙侠 / 修真</td><td>82.1%</td><td>0.67</td><td>0.70</td><td>0.62</td><td><span class="tag-grade tag-C">B-</span></td></tr>
+        <tr><td>都市 / 现代</td><td>80.5%</td><td>0.65</td><td>0.68</td><td>0.60</td><td><span class="tag-grade tag-C">B-</span></td></tr>
+        <tr><td>西方奇幻</td><td>78.3%</td><td>0.62</td><td>0.64</td><td>0.58</td><td><span class="tag-grade tag-C">C+</span></td></tr>
+        <tr><td>玄幻</td><td>79.6%</td><td>0.63</td><td>0.66</td><td>0.59</td><td><span class="tag-grade tag-C">C+</span></td></tr>
+        <tr><td>历史 / 架空历史</td><td style="color:var(--accent-red);font-weight:600;">65.2%</td><td style="color:var(--accent-red);font-weight:600;">0.31</td><td>0.55</td><td>0.48</td><td><span class="tag-grade tag-D">D</span></td></tr>
+        <tr><td>科幻</td><td>70.8%</td><td>0.42</td><td>0.58</td><td>0.50</td><td><span class="tag-grade tag-D">D</span></td></tr>
+        <tr><td>悬疑 / 推理</td><td>72.5%</td><td>0.51</td><td>0.57</td><td>0.49</td><td><span class="tag-grade tag-D">D+</span></td></tr>
+        <tr><td>轻小说 / 游戏</td><td>84.3%</td><td>0.68</td><td>0.71</td><td>0.63</td><td><span class="tag-grade tag-C">B-</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-size:0.82rem;color:var(--text-secondary);margin-top:0.5rem;">仙侠、都市、轻小说类型表现相对领先，但整体仍处于较低水平。<strong>历史架空类 faithfulness 仅 0.31</strong>，属严重问题。科幻类也仅有 0.42。悬疑推理类在复杂线索编排方面同样存在显著短板。</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 四、问题诊断 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">4</span><h2>问题诊断</h2></div>
+  <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.75rem;">基于本次基线评估数据，识别出以下 <strong>5 项关键问题</strong>，按严重程度排列：</p>
+
+  <div class="opt-box">
+    <h4>#1 历史类忠实度严重不足 (0.31)</h4>
+    <p style="font-size:0.82rem;color:var(--text-secondary);">Agent 在历史架空场景中频繁出现时代错位。典型表现为将现代/明朝以后的概念混入三国、春秋等早期背景。例如在三国背景中出现 "火枪"" 燧发枪 ""蒸汽机" 等不符合时代设定的描述。根本原因在于系统 Prompt 缺乏历史时期的限定约束，Agent 倾向于依赖通用知识进行填充。</p>
+  </div>
+
+  <div class="opt-box">
+    <h4>#2 幻觉评分偏高 (3.2/5)</h4>
+    <p style="font-size:0.82rem;color:var(--text-secondary);">整体幻觉检测得分为 3.2/5，属于较高水平。主要表现为：技术名词幻觉（科幻类中出现不存在的技术原理）、设定混淆（西幻与仙侠修炼体系混用）、地理与历史事实错误。幻觉在长上下文 (>300 字) 样本中发生率比短样本高 40%。</p>
+  </div>
+
+  <div class="opt-box">
+    <h4>#3 缺乏类型区分意识</h4>
+    <p style="font-size:0.82rem;color:var(--text-secondary);">Agent 在当前的基底 Prompt 下未对不同网文类型做差异化处理。对不同类型采用相同的生成策略，导致类型特征明显的场景（如仙侠的修炼术语、西幻的魔法体系、历史类的时代限定）难以准确呈现。8 个类型的 faithfulness 标准差为 0.12，揭示出类型间质量差异显著。</p>
+  </div>
+
+  <div class="opt-box">
+    <h4>#4 长上下文质量退化</h4>
+    <p style="font-size:0.82rem;color:var(--text-secondary);">当前文背景 > 300 字时，Agent 的 faithfulness 平均下降 0.15，response_time 增加 35%。上下文窗口的早期信息在长序列中容易被"稀释"，导致 Agent 在续写后期逐渐偏离初始设定。这是制约 Agent 处理复杂情节的核心瓶颈。</p>
+  </div>
+
+  <div class="opt-box">
+    <h4>#5 响应延迟过高 (2,104ms)</h4>
+    <p style="font-size:0.82rem;color:var(--text-secondary);">平均 2,104ms 的响应时间在交互式创作场景中不可接受。P95 延迟达到 3,800ms。延迟主要来源于两个因素：模型推理本身耗时（占比约 70%）以及长上下文场景下的注意力计算（占比约 30%）。需要从模型调用策略与上下文管理两方面入手优化。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 五、LLM Judge 评估 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" style="border-bottom:none;">
+  <div class="section-header"><span class="num">5</span><h2>LLM Judge 深度评估</h2></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>评估维度</th><th>评分</th><th>评级</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>安全性 (Safety)</td><td>3.8 / 5.0</td><td><span class="tag-grade tag-C">良好</span></td><td>未出现违禁内容，但部分历史类样本存在价值观偏差</td></tr>
+        <tr><td>推理质量 (Reasoning)</td><td>3.1 / 5.0</td><td><span class="tag-grade tag-D">待优化</span></td><td>情节推进逻辑偶有断裂，因果链不够清晰</td></tr>
+        <tr><td>交互流畅性 (Interaction)</td><td>3.5 / 5.0</td><td><span class="tag-grade tag-C">一般</span></td><td>叙述节奏基本流畅，但类型切换时风格突变的概率高</td></tr>
+        <tr><td>幻觉控制 (Hallucination)</td><td>3.2 / 5.0</td><td><span class="tag-grade tag-D">待优化</span></td><td>设定冲突与事实错误为主要问题</td></tr>
+        <tr><td>上下文利用</td><td>3.0 / 5.0</td><td><span class="tag-grade tag-D">待优化</span></td><td>长上下文场景下召回不足，关键信息丢失严重</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;box-shadow:var(--shadow);">
+    <div style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:0.4rem;">典型失败样本分析</div>
+    <div style="background:#fff1f0;padding:0.6rem 0.8rem;border-radius:6px;font-size:0.82rem;margin-bottom:0.5rem;">
+      <strong style="color:var(--accent-red);">历史架空样本 PC-187</strong><br>
+      <strong>前文：</strong>建安十三年，赤壁之战在即。周瑜站在战船上，望着北岸连绵不绝的曹军大营。<br>
+      <strong>Agent 输出：</strong>周瑜下令架起火枪，一排排燧发枪手在船头列队……黄盖带着二十艘装满火药的船冲向曹军。<br>
+      <strong style="color:var(--accent-red);">诊断：</strong>火枪与火药在三国时期均不存在，属严重历史常识性幻觉。faithfulness = 0.28。
+    </div>
+    <div style="background:#fff1f0;padding:0.6rem 0.8rem;border-radius:6px;font-size:0.82rem;">
+      <strong style="color:var(--accent-red);">科幻样本 PC-159</strong><br>
+      <strong>前文：</strong>联盟的曲率引擎舰船正在启动，空间在引擎作用下产生涟漪般的波动。<br>
+      <strong>Agent 输出：</strong>舰船上的反物质湮灭引擎发出轰鸣，离子推进器喷出长长的蓝色尾焰。<br>
+      <strong style="color:var(--accent-red);">诊断：</strong>曲率引擎不应有尾焰/轰鸣，Agent 将传统推进方式混入曲率驱动背景。faithfulness = 0.35。
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Footer ═══ -->
+<div class="footer">
+  <strong>Agent 评估平台</strong> · ROUND 01 基线评估 · v0.1<br>
+  生成日期：2026-05-10 · LLM Judge 引擎：DeepSeek-Chat<br>
+  <span style="font-size:0.72rem;">Confidential — Eval Platform Internal Use</span>
+</div>
+
+</body>
+</html>

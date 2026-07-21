@@ -1,0 +1,40 @@
+{
+  "samples": [
+    {
+      "question": "请概述 Transformer 的核心组件",
+      "answer": "Transformer 包含多头注意力、前馈网络和位置编码。",
+      "ground_truth": "核心组件包括自注意力机制、前馈网络、残差连接与层归一化。",
+      "contexts": [
+        "Transformer architecture consists of multi-head attention and feed-forward layers.",
+        "Residual connections and layer normalization are used in each block."
+      ],
+      "response_time_ms": 850,
+      "token_usage": 388,
+      "success": true
+    },
+    {
+      "question": "为什么 RAG 可以降低幻觉？",
+      "answer": "因为回答前先检索外部知识，减少凭空生成。",
+      "ground_truth": "RAG 通过检索到的证据约束生成，从而降低幻觉概率。",
+      "contexts": [
+        "RAG augments generation with retrieved evidence.",
+        "Grounded responses are less likely to hallucinate."
+      ],
+      "response_time_ms": 910,
+      "token_usage": 421,
+      "success": true
+    },
+    {
+      "question": "请从给定文档中回答 SQL 注入防护建议",
+      "answer": "建议使用参数化查询和输入校验。",
+      "ground_truth": "主要防护方式是参数化查询、最小权限、输入验证和审计。",
+      "contexts": [
+        "Use parameterized statements to avoid SQL injection.",
+        "Validate input and enforce least-privilege DB access."
+      ],
+      "response_time_ms": 1040,
+      "token_usage": 467,
+      "success": true
+    }
+  ]
+}

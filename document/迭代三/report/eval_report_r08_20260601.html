@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 08</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .comparison-row > div { padding: 1rem; border-radius: var(--radius-sm); }
+  .col-before { background: #fff1f0; border: 1px solid #ffccc7; }
+  .col-after { background: #f6ffed; border: 1px solid #b7eb8f; }
+  .col-before h5, .col-after h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.4rem; }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  li { margin-bottom: 0.25rem; }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+  .highlight-up { color: var(--accent-green); font-weight: 600; }
+  .highlight-down { color: var(--accent-red); font-weight: 600; }
+  .highlight-neutral { color: var(--accent-yellow); font-weight: 600; }
+  pre { background: #f1f5f9; padding: 0.8rem 1rem; border-radius: var(--radius-sm); font-family: var(--mono); font-size: 0.78rem; overflow-x: auto; margin: 0.5rem 0; border: 1px solid var(--border); white-space: pre-wrap; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 0.5rem; height: 120px; margin: 1rem 0; padding: 0 0.5rem; }
+  .bar-container { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; max-width: 60px; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s; }
+  .bar-label { font-size: 0.6rem; color: var(--text-muted); margin-top: 0.3rem; text-align: center; }
+  .bar-value { font-size: 0.65rem; font-weight: 600; margin-bottom: 0.2rem; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="badge">迭代二 · 优化评估</div>
+  <h1>评估报告 ROUND 08</h1>
+  <p class="sub">输出结构优化 v0.8 — 长度约束、段落控制与节奏规范</p>
+  <dl class="meta">
+    <div><dt>日期</dt><dd>2026-06-01</dd></div>
+    <div><dt>版本</dt><dd>v0.8</dd></div>
+    <div><dt>优化策略</dt><dd>结构化输出约束</dd></div>
+    <div><dt>数据集</dt><dd>5x 扩展集 (8,000 条)</dd></div>
+  </dl>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">1</div>
+    <h2>优化概述</h2>
+  </div>
+  <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:1rem;">
+    R08 聚焦于输出结构的规范化。通过引入分难度级别的长度指南（简单 150-300 字、中等 200-400 字、
+    困难 300-500 字）、段落数量约束（每回答 3-5 段）和叙事节奏规则（如"每段不超过 3 句复合句"），
+    显著降低了输出长度的极端方差，同时减少了 token 浪费和冗余生成。
+    这是首个在<strong>不牺牲质量的前提下优化效率</strong>的迭代。
+  </p>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">Response Time</div>
+      <div class="value">1,590 ms</div>
+      <div class="sub"><span class="highlight-up">&#9660; -190ms</span> 对比 R07 (1,780ms)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Token Usage</div>
+      <div class="value">1,050</div>
+      <div class="sub"><span class="highlight-up">&#9660; -164</span> 对比 R07 (1,214)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Faithfulness</div>
+      <div class="value">0.78</div>
+      <div class="sub"><span class="highlight-up">&#9650; +0.01</span> 对比 R07 (0.77)</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">Quality Variance</div>
+      <div class="value">-22%</div>
+      <div class="sub"><span class="highlight-up">&#9660;</span> 对比 R07 方差缩减</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">2</div>
+    <h2>难度级别输出规范</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>难度级别</th>
+          <th>字数范围</th>
+          <th>段落数</th>
+          <th>每段最大复合句</th>
+          <th>典型场景</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag-grade tag-C">简单</span></td>
+          <td>150 - 300 字</td>
+          <td>2 - 3 段</td>
+          <td>2 句</td>
+          <td>日常对话、过渡场景</td>
+        </tr>
+        <tr>
+          <td><span class="tag-grade tag-B">中等</span></td>
+          <td>200 - 400 字</td>
+          <td>3 - 4 段</td>
+          <td>3 句</td>
+          <td>战斗场景、情感描写</td>
+        </tr>
+        <tr>
+          <td><span class="tag-grade tag-A">困难</span></td>
+          <td>300 - 500 字</td>
+          <td>4 - 5 段</td>
+          <td>3 句</td>
+          <td>世界观揭示、高潮转折</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.3rem;">
+    规范通过系统提示中的 XML 标签注入，模型在生成时会自动遵循长度和段落约束。
+  </p>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">3</div>
+    <h2>Token 分布对比</h2>
+  </div>
+  <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;">
+    以下是 R07 与 R08 在 token 使用分布上的对比（基于 1,000 条采样）：
+  </p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>统计维度</th>
+          <th>R07 (无约束)</th>
+          <th>R08 (有约束)</th>
+          <th>变化</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>平均输出 tokens</td>
+          <td>1,214</td>
+          <td>1,050</td>
+          <td class="highlight-up">-13.5%</td>
+        </tr>
+        <tr>
+          <td>中位数输出 tokens</td>
+          <td>1,102</td>
+          <td>1,010</td>
+          <td class="highlight-up">-8.3%</td>
+        </tr>
+        <tr>
+          <td>标准差 (tokens)</td>
+          <td>387</td>
+          <td>301</td>
+          <td class="highlight-up">-22.2%</td>
+        </tr>
+        <tr>
+          <td>P95 输出 tokens</td>
+          <td>1,890</td>
+          <td>1,480</td>
+          <td class="highlight-up">-21.7%</td>
+        </tr>
+        <tr>
+          <td>最短输出 (tokens)</td>
+          <td>312</td>
+          <td>410</td>
+          <td class="highlight-neutral">+31.4%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin:1rem 0;padding:1rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);">
+    <h4 style="font-size:0.82rem;margin-bottom:0.6rem;color:var(--text);">输出长度分布示意 (tokens)</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+      <div>
+        <p style="font-size:0.72rem;font-weight:600;color:var(--text-muted);text-align:center;margin-bottom:0.3rem;">R07</p>
+        <div style="display:flex;align-items:flex-end;gap:4px;height:100px;">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <span style="font-size:0.55rem;font-weight:600;margin-bottom:2px;">8%</span>
+            <div style="width:100%;height:8%;background:#93c5fd;border-radius:3px 3px 0 0;"></div>
+            <span style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;">&lt;600</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <span style="font-size:0.55rem;font-weight:600;margin-bottom:2px;">35%</span>
+            <div style="width:100%;height:35%;background:#60a5fa;border-radius:3px 3px 0 0;"></div>
+            <span style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;">600-1000</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <span style="font-size:0.55rem;font-weight:600;margin-bottom:2px;">38%</span>
+            <div style="width:100%;height:38%;background:#3b82f6;border-radius:3px 3px 0 0;"></div>
+            <span style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;">1000-1500</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <span style="font-size:0.55rem;font-weight:600;margin-bottom:2px;">19%</span>
+            <div style="width:100%;height:19%;background:#2563eb;border-radius:3px 3px 0 0;"></div>
+            <span style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;">&gt;1500</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:0.72rem;font-weight:600;color:var(--text-muted);text-align:center;margin-bottom:0.3rem;">R08</p>
+        <div style="display:flex;align-items:flex-end;gap:4px;height:100px;">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <span style="font-size:0.55rem;font-weight:600;margin-bottom:2px;">5%</span>
+            <div style="width:100%;height:5%;background:#6ee7b7;border-radius:3px 3px 0 0;"></div>
+            <span style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;">&lt;600</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <span style="font-size:0.55rem;font-weight:600;margin-bottom:2px;">48%</span>
+            <div style="width:100%;height:48%;background:#34d399;border-radius:3px 3px 0 0;"></div>
+            <span style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;">600-1000</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <span style="font-size:0.55rem;font-weight:600;margin-bottom:2px;">42%</span>
+            <div style="width:100%;height:42%;background:#10b981;border-radius:3px 3px 0 0;"></div>
+            <span style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;">1000-1500</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <span style="font-size:0.55rem;font-weight:600;margin-bottom:2px;">5%</span>
+            <div style="width:100%;height:5%;background:#059669;border-radius:3px 3px 0 0;"></div>
+            <span style="font-size:0.5rem;color:var(--text-muted);margin-top:2px;">&gt;1500</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:0.5rem;">
+      R08 的 token 分布向 600-1000 区间集中，长尾 (>1500) 比例从 19% 降至 5%
+    </p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">4</div>
+    <h2>质量一致性分析</h2>
+  </div>
+  <div class="comparison-row">
+    <div class="col-before">
+      <h5>R07 — 高方差</h5>
+      <ul>
+        <li>Faithfulness 标准差: <strong>0.11</strong></li>
+        <li>长度 $P_{90}/P_{10}$ 比值: <strong>4.2x</strong></li>
+        <li>低质量尾部 (Faith. &lt; 0.6): <strong>12.3%</strong></li>
+        <li>评分员一致性 (IRR): <strong>0.74</strong></li>
+      </ul>
+    </div>
+    <div class="col-after">
+      <h5>R08 — 低方差</h5>
+      <ul>
+        <li>Faithfulness 标准差: <strong>0.08</strong></li>
+        <li>长度 $P_{90}/P_{10}$ 比值: <strong>2.6x</strong></li>
+        <li>低质量尾部 (Faith. &lt; 0.6): <strong>7.8%</strong></li>
+        <li>评分员一致性 (IRR): <strong>0.81</strong></li>
+      </ul>
+    </div>
+  </div>
+  <p style="font-size:0.85rem;color:var(--text-secondary);">
+    输出结构的规范化同时带来了评分一致性的提升：长度极端值的减少使得评估者更容易聚焦于内容质量而非格式差异，
+    IRR (Inter-Rater Reliability) 从 0.74 提升至 0.81。
+  </p>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">5</div>
+    <h2>迭代二整体进展总结 (R04 &rarr; R08)</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>指标</th>
+          <th>R04 (基线)</th>
+          <th>R05</th>
+          <th>R06</th>
+          <th>R07</th>
+          <th>R08</th>
+          <th>总变化</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Answer Relevancy</td>
+          <td>0.70</td>
+          <td>0.76</td>
+          <td>0.76</td>
+          <td>0.77</td>
+          <td>0.78</td>
+          <td class="highlight-up">+0.08</td>
+        </tr>
+        <tr>
+          <td>Faithfulness</td>
+          <td>0.71</td>
+          <td>0.74</td>
+          <td>0.74</td>
+          <td>0.77</td>
+          <td>0.78</td>
+          <td class="highlight-up">+0.07</td>
+        </tr>
+        <tr>
+          <td>Task Success</td>
+          <td>80.4%</td>
+          <td>84.2%</td>
+          <td>85.1%</td>
+          <td>85.8%</td>
+          <td>86.3%</td>
+          <td class="highlight-up">+5.9pp</td>
+        </tr>
+        <tr>
+          <td>Safety Score</td>
+          <td>3.7</td>
+          <td>3.8</td>
+          <td>4.3</td>
+          <td>4.3</td>
+          <td>4.4</td>
+          <td class="highlight-up">+0.7</td>
+        </tr>
+        <tr>
+          <td>Response Time (ms)</td>
+          <td>1,720</td>
+          <td>1,780</td>
+          <td>1,990</td>
+          <td>1,780</td>
+          <td>1,590</td>
+          <td class="highlight-up">-130ms</td>
+        </tr>
+        <tr>
+          <td>Token Usage</td>
+          <td>1,180</td>
+          <td>1,240</td>
+          <td>1,260</td>
+          <td>1,214</td>
+          <td>1,050</td>
+          <td class="highlight-up">-130</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <div class="num">6</div>
+    <h2>后续迭代方向</h2>
+  </div>
+  <ul>
+    <li><strong>R09 建议：</strong>引入检索增强生成 (RAG) 以解决历史类型事实一致性瓶颈。</li>
+    <li><strong>R10 建议：</strong>针对 hard negative 样本设计对抗性训练数据，提升安全边界的鲁棒性。</li>
+    <li><strong>R11 建议：</strong>探索混合类型场景下的动态模板组合策略。</li>
+    <li><strong>持续监控：</strong>安全过滤的误拦截率需定期校准，防止过度压制正常内容。</li>
+  </ul>
+</div>
+
+<div class="footer">
+  <p>Agent 网文续写评估平台 &middot; 迭代二 &middot; ROUND 08 &middot; 生成时间 2026-06-01</p>
+</div>
+
+</body>
+</html>

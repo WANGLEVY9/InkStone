@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>评估报告 | ROUND 02</title>
+<style>
+  :root { --primary: #1a2332; --accent: #3b82f6; --accent-green: #10b981; --accent-yellow: #f59e0b; --accent-orange: #f97316; --accent-red: #ef4444; --accent-purple: #8b5cf6; --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0; --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8; --radius: 12px; --radius-sm: 8px; --shadow: 0 1px 3px rgba(0,0,0,.06); --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07); --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; --mono: "SF Mono", "Fira Code", "Consolas", monospace; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 15px; }
+  body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%); color: #fff; padding: 3rem 3rem 2.5rem; }
+  .cover .badge { display: inline-block; font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.3rem 0.8rem; border: 1px solid rgba(255,255,255,.25); border-radius: 20px; margin-bottom: 1rem; text-transform: uppercase; }
+  .cover h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cover p.sub { font-size: 0.95rem; color: rgba(255,255,255,.65); margin-bottom: 1.5rem; }
+  .cover .meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.85rem; color: rgba(255,255,255,.6); }
+  .cover .meta dt { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta dd { color: #fff; font-weight: 600; }
+  .section { padding: 2rem 3rem; border-bottom: 1px solid var(--border); }
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+  .section-header .num { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .section-header h2 { font-size: 1.15rem; font-weight: 700; }
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+  .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+  .metric-card .label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+  .metric-card .value { font-weight: 700; font-size: 1.6rem; letter-spacing: -0.3px; }
+  .metric-card .sub { font-size: 0.78rem; color: var(--text-secondary); }
+  .metric-card .delta { font-size: 0.72rem; font-weight: 600; margin-left: 0.3rem; }
+  .table-wrap { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: var(--card); }
+  thead { background: var(--primary); color: #fff; }
+  th { padding: 0.6rem 1rem; text-align: left; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase; }
+  td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f1f5f9; }
+  .tag-grade { display: inline-block; font-size: 0.68rem; font-weight: 600; padding: 0.15rem 0.55rem; border-radius: 4px; }
+  .tag-A { background: #d1fae5; color: #065f46; }
+  .tag-B { background: #dbeafe; color: #1e40af; }
+  .tag-C { background: #fef3c7; color: #92400e; }
+  .tag-D { background: #ffe4e6; color: #9f1239; }
+  .opt-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: var(--shadow); }
+  .opt-box h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+  .opt-box code { background: #f1f5f9; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.82rem; }
+  .prompt-block { background: #0f172a; color: #e2e8f0; border-radius: var(--radius-sm); padding: 1rem; margin: 0.75rem 0; font-family: var(--mono); font-size: 0.78rem; line-height: 1.7; overflow-x: auto; }
+  .prompt-block .highlight { color: #60a5fa; }
+  .prompt-block .comment { color: #64748b; }
+  .comparison-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .comparison-row > div { padding: 1rem; border-radius: var(--radius-sm); }
+  .col-before { background: #fff1f0; border: 1px solid #ffccc7; }
+  .col-after { background: #f6ffed; border: 1px solid #b7eb8f; }
+  .col-before h5, .col-after h5 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0.4rem; }
+  ul, ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); }
+  li { margin-bottom: 0.25rem; }
+  .footer { background: var(--primary); color: rgba(255,255,255,.5); padding: 1.5rem 3rem; font-size: 0.78rem; }
+  @media (max-width: 768px) { .section { padding: 1.5rem; } .comparison-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ═══ Cover ═══ -->
+<div class="cover">
+  <div class="badge">Prompt 工程优化</div>
+  <h1>Agent 小说创作 v0.2 · Prompt 工程优化评估</h1>
+  <p class="sub">引入 Genre Anchor 提示策略 · 为 8 类网文类型定制化 Prompt 锚定</p>
+  <dl class="meta">
+    <div><dt>评估轮次</dt><dd>ROUND 02</dd></div>
+    <div><dt>版本</dt><dd>v0.2</dd></div>
+    <div><dt>日期</dt><dd>2026-05-13</dd></div>
+    <div><dt>基线版本</dt><dd>v0.1 (ROUND 01)</dd></div>
+    <div><dt>优化策略</dt><dd>Genre Anchor Prompting</dd></div>
+  </dl>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 一、执行摘要 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">1</span><h2>执行摘要</h2></div>
+  <p>本轮优化核心为 <strong>Genre Anchor（类型锚定）</strong> 策略：在系统 Prompt 中为每种网文类型添加独立的类型定义、核心套路、禁用模式及设定规则。目的是提升 Agent 对不同叙事范式的识别与遵循能力，尤其是在历史、科幻等复杂类型场景中的设定一致性。</p>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="label">任务成功率</div>
+      <div class="value" style="color:var(--accent-green)">80.4%</div>
+      <div class="sub">184 / 240 → 193 / 240</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +3.7%</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">忠实度</div>
+      <div class="value" style="color:var(--accent-green)">0.66</div>
+      <div class="sub">/ 1.0</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +0.08</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">答案相关性</div>
+      <div class="value" style="color:var(--accent-green)">0.70</div>
+      <div class="sub">/ 1.0</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +0.08</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">上下文召回</div>
+      <div class="value" style="color:var(--accent-yellow)">0.59</div>
+      <div class="sub">/ 1.0</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +0.04</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">平均响应时间</div>
+      <div class="value" style="color:var(--accent-yellow)">2,087</div>
+      <div class="sub">ms</div>
+      <div class="delta" style="color:var(--accent-green);">&#9660; -17ms</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">幻觉评分</div>
+      <div class="value" style="color:var(--accent-yellow)">3.5</div>
+      <div class="sub">/ 5.0</div>
+      <div class="delta" style="color:var(--accent-green);">&#9650; +0.3</div>
+    </div>
+  </div>
+
+  <div class="opt-box">
+    <h4>ROUND 01 vs ROUND 02 核心指标对比</h4>
+    <div class="comparison-row">
+      <div class="col-before">
+        <h5>优化前 (v0.1 · R01)</h5>
+        <ul>
+          <li>task_success: 76.7%</li>
+          <li>faithfulness: 0.58</li>
+          <li>answer_relevancy: 0.62</li>
+          <li>context_recall: 0.55</li>
+          <li>hallucination: 3.2/5</li>
+          <li>历史类 faithfulness: 0.31</li>
+        </ul>
+      </div>
+      <div class="col-after">
+        <h5>优化后 (v0.2 · R02)</h5>
+        <ul>
+          <li>task_success: 80.4% <span style="color:var(--accent-green);font-weight:600;">&#9650; +3.7%</span></li>
+          <li>faithfulness: 0.66 <span style="color:var(--accent-green);font-weight:600;">&#9650; +0.08</span></li>
+          <li>answer_relevancy: 0.70 <span style="color:var(--accent-green);font-weight:600;">&#9650; +0.08</span></li>
+          <li>context_recall: 0.59 <span style="color:var(--accent-green);font-weight:600;">&#9650; +0.04</span></li>
+          <li>hallucination: 3.5/5 <span style="color:var(--accent-green);font-weight:600;">&#9650; +0.3</span></li>
+          <li>历史类 faithfulness: 0.48 <span style="color:var(--accent-green);font-weight:600;">&#9650; +0.17</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 二、优化详情 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">2</span><h2>优化详情</h2></div>
+
+  <h3 style="font-size:0.9rem;font-weight:600;margin-bottom:0.4rem;">2.1 策略概述</h3>
+  <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.75rem;">
+    Genre Anchor 策略为每种网文类型定义 4 个维度的约束：<strong>类型定义 (Genre Definition)</strong>、<strong>核心套路 (Core Tropes)</strong>、<strong>禁用模式 (Forbidden Patterns)</strong>、<strong>设定规则 (Setting Rules)</strong>。以下为仙侠 (xianxia) 类型的完整 Prompt 模板：
+  </p>
+
+  <div class="prompt-block">
+<span class="comment">## ===== Genre Anchor: xianxia =====</span>
+<span class="highlight">Genre Definition:</span>
+仙侠/修真小说以中国传统道教文化为基底，核心叙事围绕"修炼—突破—飞升"的成长体系展开。世界观包含灵气、丹田、金丹、元婴、元神等修真境界设定。
+
+<span class="highlight">Core Tropes:</span>
+- 修炼体系：炼气→筑基→金丹→元婴→化神→渡劫→飞升
+- 核心冲突：正邪之争、资源争夺、天道因果
+- 常见场景：宗门试炼、秘境探险、丹药炼制、法宝祭炼
+
+<span class="highlight">Forbidden Patterns:</span>
+- 禁止混入西方奇幻元素（如魔法、精灵、龙骑士）
+- 避免使用现代科技概念（如基因改造、量子力学）
+- 不得使用非中国传统文化命名（如希腊神话角色）
+- 修炼突破必须遵循境界递进顺序，不可跳级
+
+<span class="highlight">Setting Rules:</span>
+- 战斗描述需基于灵力/法宝/阵法，而非物理拳脚
+- 时间跨度可以极大（百年修炼为常态）
+- 因果报应设定必须贯穿整个世界观
+- 宗门/家族为社会基本组织单位
+  </div>
+
+  <h3 style="font-size:0.9rem;font-weight:600;margin:1rem 0 0.4rem;">2.2 各类型 Anchor 关键词统计</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>类型</th><th>Anchor 词条数</th><th>禁用规则</th><th>设定约束</th><th>示例术语</th></tr></thead>
+      <tbody>
+        <tr><td>仙侠 / 修真</td><td>42</td><td>8 条</td><td>12 条</td><td>金丹、元婴、渡劫、飞升</td></tr>
+        <tr><td>都市 / 现代</td><td>35</td><td>6 条</td><td>10 条</td><td>职场、都市异能、商战</td></tr>
+        <tr><td>西方奇幻</td><td>38</td><td>7 条</td><td>11 条</td><td>魔法、骑士、龙、精灵</td></tr>
+        <tr><td>玄幻</td><td>36</td><td>6 条</td><td>10 条</td><td>斗气、魂环、神级、位面</td></tr>
+        <tr><td>历史 / 架空历史</td><td>45</td><td>10 条</td><td>14 条</td><td>朝代限定、官制、礼法</td></tr>
+        <tr><td>科幻</td><td>40</td><td>8 条</td><td>12 条</td><td>硬科幻、AI、星际、赛博</td></tr>
+        <tr><td>悬疑 / 推理</td><td>32</td><td>6 条</td><td>9 条</td><td>线索链、红鲱鱼、反转</td></tr>
+        <tr><td>轻小说 / 游戏</td><td>34</td><td>5 条</td><td>8 条</td><td>系统流、面板、升级、抽卡</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 三、分类型对比 (Before vs After) -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header"><span class="num">3</span><h2>分类型对比分析</h2></div>
+  <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.5rem;">以下对比显示每个类型在引入 Genre Anchor 前后的 faithfulness 和 task_success 变化：</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>类型</th><th>R01 faithfulness</th><th>R02 faithfulness</th><th>变化</th><th>R01 success</th><th>R02 success</th><th>变化</th></tr></thead>
+      <tbody>
+        <tr><td>仙侠 / 修真</td><td>0.67</td><td>0.75</td><td><span style="color:var(--accent-green);font-weight:600;">+0.08</span></td><td>82.1%</td><td>85.3%</td><td><span style="color:var(--accent-green);font-weight:600;">+3.2%</span></td></tr>
+        <tr><td>都市 / 现代</td><td>0.65</td><td>0.73</td><td><span style="color:var(--accent-green);font-weight:600;">+0.08</span></td><td>80.5%</td><td>83.7%</td><td><span style="color:var(--accent-green);font-weight:600;">+3.2%</span></td></tr>
+        <tr><td>西方奇幻</td><td>0.62</td><td>0.71</td><td><span style="color:var(--accent-green);font-weight:600;">+0.09</span></td><td>78.3%</td><td>82.1%</td><td><span style="color:var(--accent-green);font-weight:600;">+3.8%</span></td></tr>
+        <tr><td>玄幻</td><td>0.63</td><td>0.72</td><td><span style="color:var(--accent-green);font-weight:600;">+0.09</span></td><td>79.6%</td><td>83.0%</td><td><span style="color:var(--accent-green);font-weight:600;">+3.4%</span></td></tr>
+        <tr><td>历史 / 架空历史</td><td>0.31</td><td>0.48</td><td><span style="color:var(--accent-green);font-weight:600;">+0.17</span></td><td>65.2%</td><td>72.5%</td><td><span style="color:var(--accent-green);font-weight:600;">+7.3%</span></td></tr>
+        <tr><td>科幻</td><td>0.42</td><td>0.52</td><td><span style="color:var(--accent-green);font-weight:600;">+0.10</span></td><td>70.8%</td><td>75.4%</td><td><span style="color:var(--accent-green);font-weight:600;">+4.6%</span></td></tr>
+        <tr><td>悬疑 / 推理</td><td>0.51</td><td>0.60</td><td><span style="color:var(--accent-green);font-weight:600;">+0.09</span></td><td>72.5%</td><td>77.8%</td><td><span style="color:var(--accent-green);font-weight:600;">+5.3%</span></td></tr>
+        <tr><td>轻小说 / 游戏</td><td>0.68</td><td>0.74</td><td><span style="color:var(--accent-green);font-weight:600;">+0.06</span></td><td>84.3%</td><td>86.9%</td><td><span style="color:var(--accent-green);font-weight:600;">+2.6%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="opt-box">
+    <h4>关键发现</h4>
+    <ul>
+      <li><strong>历史类提升最大：</strong>faithfulness 从 0.31 跃升至 0.48 (+0.17)，时代锚定规则有效减少了跨时代概念混淆。但 0.48 仍属较低水平，需进一步优化。</li>
+      <li><strong>科幻类仍有差距：</strong>faithfulness 0.52 虽较基线提升 0.10，但技术名词幻觉问题未根本解决。Agent 在硬科幻场景中仍会创造不存在的"伪科技"概念。</li>
+      <li><strong>轻小说类提升最小：</strong>faithfulness 仅 +0.06，因其基线已相对较高，边际收益递减。</li>
+      <li><strong>任务成功率：</strong>所有类型均有提升，历史 (+7.3%) 和悬疑 (+5.3%) 增幅最大，表明 Genre Anchor 对复杂类型的效果最为显著。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- 四、剩余问题与改进方向 -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" style="border-bottom:none;">
+  <div class="section-header"><span class="num">4</span><h2>剩余问题与改进方向</h2></div>
+
+  <div class="comparison-row">
+    <div class="col-before">
+      <h5>仍存在问题</h5>
+      <ul>
+        <li><strong>历史类 faithfulness 0.48</strong> — 虽大幅提升，但距离可用标准 (0.70+) 仍有差距。Agent 在朝代内部细节（官制、服饰、礼节）上仍频繁出错。</li>
+        <li><strong>科幻类 faithfulness 0.52</strong> — 技术原理描述的幻觉率仍高，"伪科学"名词生成问题突出。</li>
+        <li><strong>上下文召回 0.59</strong> — 长上下文场景的早期信息丢失问题未根本解决，且受 Prompt 增长影响，token 消耗有所增加。</li>
+        <li>Prompt 长度增加约 800 tokens，轻微推高了响应延迟。</li>
+      </ul>
+    </div>
+    <div class="col-after">
+      <h5>下轮优化方向</h5>
+      <ul>
+        <li><strong>生成参数调优：</strong>调整 temperature、top_p 等参数以平衡忠实度与创造性。</li>
+        <li><strong>上下文窗口管理：</strong>引入滑动窗口与智能截断策略，解决长上下文退化问题。</li>
+        <li><strong>历史类专项增强：</strong>增加历史时期-技术映射表作为参考知识。</li>
+        <li><strong>科幻类知识注入：</strong>为常见科幻概念添加技术原理锚定定义。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="opt-box" style="margin-top:1.5rem;">
+    <h4>ROUND 02 小结</h4>
+    <p style="font-size:0.85rem;color:var(--text-secondary);">Genre Anchor 策略证明了 Prompt 工程对 Agent 类型感知能力的显著提升效果。8 项核心指标全线正向增长，其中 faithfulness 提升 13.8%，历史类提升幅度达 54.8%。然而，<strong>历史 (0.48) 与科幻 (0.52)</strong> 类型仍是薄弱环节，需要在生成参数与上下文管理方面进一步优化。同时应注意 Prompt 长度增加带来的效率损耗，下一轮需在保持质量的前提下控制 Prompt 规模。</p>
+  </div>
+</div>
+
+<!-- ═══ Footer ═══ -->
+<div class="footer">
+  <strong>Agent 评估平台</strong> · ROUND 02 Prompt 工程优化 · v0.2<br>
+  生成日期：2026-05-13 · 基于 ROUND 01 基线对比<br>
+  <span style="font-size:0.72rem;">Confidential — Eval Platform Internal Use</span>
+</div>
+
+</body>
+</html>
