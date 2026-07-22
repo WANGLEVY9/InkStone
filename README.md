@@ -130,9 +130,9 @@ document/
 
 感谢以下同学在本课程项目中的贡献与协作（排名不分先后）：
 
-- **蒋晨俊**（Jiang Chenjun）
+- **蒋程浚**（Jiang Chenjun）
 - **张斌驰**（Zhang Binchi）
-- **叶朝阳**（Ye Chaoyang）
+- **叶潮洋**（Ye Chaoyang）
 
 以及所有为本项目提供支持与指导的老师与助教。
 
