@@ -133,6 +133,7 @@ document/
 - **蒋程浚**（Jiang Chenjun）
 - **张斌驰**（Zhang Binchi）
 - **叶潮洋**（Ye Chaoyang）
+- **王泰杰** (Wang Taijie)
 
 以及所有为本项目提供支持与指导的老师与助教。
 
